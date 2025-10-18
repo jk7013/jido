@@ -1,0 +1,45 @@
+<!-- GitLab 커밋 다이얼로그 -->
+<div id="gitlab-commit-dialog" class="dialog-overlay" style="display: none;">
+  <div class="dialog-content">
+    <div class="dialog-header">
+      <h2 class="dialog-title">Commit to GitLab</h2>
+      <p class="dialog-description">변경된 프롬프트나 설정을 GitLab에 커밋하세요.</p>
+    </div>
+
+    <div class="dialog-body">
+      <div class="form-group">
+        <label for="commit-message">커밋 메시지</label>
+        <input 
+          type="text" 
+          id="commit-message" 
+          placeholder="feat: update RAG prompt version" 
+          class="form-input"
+          autofocus
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="commit-description">설명 (선택)</label>
+        <textarea 
+          id="commit-description" 
+          placeholder="변경 사항에 대한 자세한 설명을 입력하세요"
+          class="form-textarea"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="branch-info">
+        <span class="branch-label">Branch</span>
+        <code class="branch-name">main</code>
+      </div>
+    </div>
+
+    <div class="dialog-footer">
+      <button class="btn btn-secondary" onclick="closeGitLabDialog()">취소</button>
+      <button class="btn btn-primary" onclick="handleGitLabCommit()">커밋</button>
+    </div>
+  </div>
+</div>
+
+<!-- 토스트 알림 -->
+<div id="toast-container" class="toast-container"></div>

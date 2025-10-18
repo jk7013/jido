@@ -565,4 +565,248 @@ body.result-view header {
       grid-template-columns: 1fr;
     }
   }
+
+  /* GitLab 커밋 다이얼로그 스타일 */
+  .dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .dialog-overlay.show {
+    opacity: 1;
+  }
+
+  .dialog-content {
+    background: var(--panel);
+    border: 1px solid var(--muted);
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    max-width: 480px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(0.95);
+    transition: transform 0.2s ease;
+  }
+
+  .dialog-overlay.show .dialog-content {
+    transform: scale(1);
+  }
+
+  .dialog-header {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid var(--muted);
+  }
+
+  .dialog-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 8px 0;
+  }
+
+  .dialog-description {
+    font-size: 14px;
+    color: var(--sub);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .dialog-body {
+    padding: 24px;
+  }
+
+  .form-group {
+    margin-bottom: 24px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--sub);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-input,
+  .form-textarea {
+    width: 100%;
+    padding: 14px 16px;
+    background: #2A2E36;
+    border: 1px solid var(--muted);
+    border-radius: 8px;
+    color: #E6F2FF;
+    font-size: 14px;
+    font-family: inherit;
+    line-height: 1.4;
+    transition: all 0.15s ease-in-out;
+  }
+
+  .form-input:focus,
+  .form-textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(139, 233, 253, 0.15);
+    background: #2A2E36;
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .branch-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: rgba(27, 35, 51, 0.5);
+    border-radius: 8px;
+    font-size: 14px;
+    margin-top: 16px;
+  }
+
+  .branch-label {
+    color: var(--sub);
+  }
+
+  .branch-name {
+    background: #1B2333;
+    color: var(--accent);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: "Fira Code", monospace;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .branch-chevron {
+    font-size: 10px;
+    color: var(--sub);
+    transition: transform 0.2s ease;
+  }
+
+  .dialog-footer {
+    padding: 16px 24px 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    border-top: 1px solid var(--muted);
+  }
+
+  .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    font-family: inherit;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--sub);
+    border: 1px solid transparent;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(126, 141, 164, 0.1);
+    color: var(--text);
+    border-color: var(--muted);
+  }
+
+  .btn-primary {
+    background: #0ea5e9;
+    color: #0B1220;
+    border: 1px solid #0ea5e9;
+    font-weight: 600;
+  }
+
+  .btn-primary:hover {
+    background: #0284c7;
+    border-color: #0284c7;
+  }
+
+  .btn-primary:disabled {
+    background: var(--muted);
+    color: var(--sub);
+    border-color: var(--muted);
+    cursor: not-allowed;
+  }
+
+  /* 토스트 알림 스타일 */
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .toast {
+    background: var(--panel);
+    border: 1px solid var(--muted);
+    border-radius: 8px;
+    padding: 12px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .toast.show {
+    transform: translateX(0);
+  }
+
+  .toast.success {
+    border-color: var(--good);
+    background: rgba(62, 235, 170, 0.1);
+  }
+
+  .toast.error {
+    border-color: var(--bad);
+    background: rgba(255, 107, 107, 0.1);
+  }
+
+  .toast-icon {
+    font-size: 16px;
+  }
+
+  /* 로딩 스피너 */
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
   

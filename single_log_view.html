@@ -74,13 +74,11 @@
         flex: 1;
         overflow-y: auto;
       }
-
       .entry {
         position: relative;
         margin-bottom: 10px;
         cursor: pointer;
       }
-
       .entry::before {
         content: "";
         position: absolute;
@@ -90,22 +88,18 @@
         height: 10px;
         border-radius: 50%;
       }
-
       .entry.single::before {
         background: var(--accent);
       }
-
       .entry .summary {
         font-weight: 500;
         color: var(--text);
         font-size: 14px;
       }
-
       .entry .time {
         font-size: 12px;
         color: var(--sub);
       }
-
       .entry pre {
         display: none;
         background: #0e1320;
@@ -116,50 +110,23 @@
         white-space: pre;
         font-size: 13px;
         margin-top: 6px;
-        position: relative;
       }
-
       .entry.expanded pre {
         display: block;
       }
 
-      pre button.ghost {
-        position: absolute;
-        top: 6px;
-        right: 6px;
-      }
-
-      .tab-content {
-        display: none;
-      }
-
-      .tab-content.active {
-        display: block;
-      }
-
-      .entry.a {
-        border-left: 3px solid var(--good);
-      }
-
-      .entry.b {
-        border-left: 3px solid var(--bad);
-      }
-
-      .entry.single {
-        border-left: 3px solid var(--accent);
-      }
-
+      /* JSON syntax colors */
       .json-key {
-        color: #79c0ff;
+        color: var(--accent);
       }
       .json-string {
-        color: #a5d6ff;
+        color: var(--good);
       }
       .json-number {
-        color: #79c0ff;
+        color: var(--warn);
       }
       .json-boolean {
-        color: #ff7b72;
+        color: var(--bad);
       }
       .json-null {
         color: var(--sub);
@@ -185,8 +152,8 @@
               <h1>PromptOps</h1>
               <nav class="top-menu">
                 <button class="ghost" onclick="location.href='dashboard.html'">대시보드</button>
-                <button class="ghost" onclick="location.href='single_result_view.html'">결과 보기</button>
-                <button class="ghost" onclick="location.href='single_log_view.html'">로그 보기</button>
+                <button class="ghost" onclick="location.href='result_view.html'">결과 보기</button>
+                <button class="ghost" onclick="location.href='log_view_css.html'">로그 보기</button>
                 <button class="ghost" onclick="window.open('https://gitlab.company.local/promptops', '_blank')">
                   <img src="img/gitlab.svg" alt="GitLab" style="width:16px; vertical-align:middle; margin-right:4px;" />
                   GitLab
@@ -220,94 +187,58 @@
       </section>
     </main>
 
-    <main id="rin" class="tab-content">
-      <section class="panel">
-        <h2>RIN Logs</h2>
-        <div id="timelineRin" class="timeline"></div>
-      </section>
+    <!-- 다른 탭들 -->
+    <main id="rin" class="tab-content" style="display:none">
+      <section class="panel"><h2>RIN 로그</h2><div id="rinLog"></div></section>
     </main>
-
-    <main id="rpc" class="tab-content">
-      <section class="panel">
-        <h2>RPC Logs</h2>
-        <div id="timelineRpc" class="timeline"></div>
-      </section>
+    <main id="rpc" class="tab-content" style="display:none">
+      <section class="panel"><h2>RPC 로그</h2><div id="rpcLog"></div></section>
     </main>
-
-    <main id="qry" class="tab-content">
-      <section class="panel">
-        <h2>QRY Logs</h2>
-        <div id="timelineQry" class="timeline"></div>
-      </section>
+    <main id="qry" class="tab-content" style="display:none">
+      <section class="panel"><h2>QRY 로그</h2><div id="qryLog"></div></section>
     </main>
-
-    <main id="kql" class="tab-content">
-      <section class="panel">
-        <h2>KQL Logs</h2>
-        <div id="timelineKql" class="timeline"></div>
-      </section>
+    <main id="kql" class="tab-content" style="display:none">
+      <section class="panel"><h2>KQL 로그</h2><div id="kqlLog"></div></section>
     </main>
 
     <footer>
-      LLM · RIN · RPC 등 각 엔진 로그를 시각적으로 비교 – 클릭 시 세부 JSON 표시
+      LLM · RIN · RPC 등 각 엔진 로그를 시각적으로 비교 — 클릭 시 세부 JSON 표시
     </footer>
 
     <script>
-      // 싱글 모드 로그 데이터 (localStorage에서 가져오기)
-      const singleRuns = JSON.parse(localStorage.getItem("single_runs") || "[]");
-      
-      // 샘플 로그 데이터 (실제 데이터가 없을 때 사용)
-      const sampleLogs = {
+      const logs = {
         single: [
           {
-            type: "request",
             timestamp: "2025-10-17 14:58:40,934",
+            type: "request",
             data: {
               model: "Konan-LLM-ENT-11",
               user: "admin",
-              body: "안녕. 너는 어느회사 llm이니?",
+              body: "안녕, 너는 어느회사 11m이니?",
             },
           },
           {
-            type: "response",
             timestamp: "2025-10-17 14:59:12,654",
+            type: "response",
             data: {
               output: "저는 코난테크놀로지의 Konect입니다.",
               latency_ms: 2870,
             },
           },
-        ]
+        ],
+        RIN: [
+          {
+            timestamp: "2025-10-17 15:01:02",
+            type: "INFO",
+            data: { stage: "ranker", msg: "rerank 50 candidates" },
+          },
+          {
+            timestamp: "2025-10-17 15:01:04",
+            type: "DEBUG",
+            data: { duration_ms: 140, msg: "rerank completed" },
+          },
+        ],
       };
-      
-      // 싱글 모드 로그를 LLM 형식으로 변환
-      const logs = {
-        single: singleRuns.length > 0 ? singleRuns.map((run, index) => ({
-          type: "Single Prompt",
-          timestamp: new Date(run.time || Date.now()).toLocaleString(),
-          data: {
-            prompt: run.prompt?.name || "Single Prompt",
-            query: run.query || "",
-            answer: run.answer || "",
-            latency: run.lat || 0,
-            tokens: run.tok || 0,
-            scores: run.scores || {}
-          }
-        })) : sampleLogs.single
-      };
-
-      function showTab(tabName) {
-        // 모든 탭 비활성화
-        document.querySelectorAll(".tab").forEach((tab) => {
-          tab.classList.remove("active");
-        });
-        document.querySelectorAll(".tab-content").forEach((content) => {
-          content.classList.remove("active");
-        });
-
-        // 선택된 탭 활성화
-        document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add("active");
-        document.getElementById(tabName).classList.add("active");
-      }
 
       function syntaxHighlight(json) {
         if (typeof json != "string") json = JSON.stringify(json, undefined, 2);
@@ -341,15 +272,34 @@
         });
       }
 
-      // 싱글 로그 렌더링
       renderTimeline("timeline", logs.single, "single");
 
-      // 빈 탭들에 대한 기본 메시지
-      const emptyTabs = ["timelineRin", "timelineRpc", "timelineQry", "timelineKql"];
-      emptyTabs.forEach(tabId => {
-        const cont = document.getElementById(tabId);
-        cont.innerHTML = '<div class="empty">해당 엔진의 로그가 없습니다.</div>';
-      });
+      function renderGenericLogs(targetId, list) {
+        const cont = document.getElementById(targetId);
+        list.forEach((e) => {
+          const div = document.createElement("div");
+          div.className = "entry";
+          div.innerHTML = `
+            <div class="summary">${e.type}</div>
+            <div class="time">${e.timestamp}</div>
+            <pre>${syntaxHighlight(e.data)}</pre>
+          `;
+          div.addEventListener("click", () => div.classList.toggle("expanded"));
+          cont.appendChild(div);
+        });
+      }
+      renderGenericLogs("rinLog", logs.RIN);
+
+      function showTab(id) {
+        document.querySelectorAll(".tab").forEach((t) =>
+          t.classList.remove("active")
+        );
+        document.querySelectorAll(".tab-content").forEach(
+          (c) => (c.style.display = "none")
+        );
+        document.querySelector(`.tab[onclick*="${id}"]`).classList.add("active");
+        document.getElementById(id).style.display = "flex";
+      }
     </script>
   </body>
 </html>
