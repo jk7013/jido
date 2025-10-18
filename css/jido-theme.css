@@ -120,12 +120,13 @@
     border-radius: 9px;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 0 6px rgba(80, 227, 194, 0.2);
   }
   
   .toggle-switch.active {
     background: #1a4a66;
     border-color: var(--accent);
-    box-shadow: 0 0 12px rgba(80, 227, 194, 0.6), 0 0 24px rgba(80, 227, 194, 0.3);
+    box-shadow: 0 0 8px rgba(80, 227, 194, 0.3);
   }
   
   .toggle-slider {
@@ -137,13 +138,13 @@
     background: var(--sub);
     border-radius: 50%;
     transition: all 0.3s ease;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 0 4px rgba(80, 227, 194, 0.3);
   }
   
   .toggle-switch.active .toggle-slider {
     transform: translateX(20px);
     background: var(--accent);
-    box-shadow: 0 0 10px rgba(80, 227, 194, 0.8), 0 0 20px rgba(80, 227, 194, 0.4);
+    box-shadow: 0 0 6px rgba(80, 227, 194, 0.5);
   }
   
   .toggle-label {
