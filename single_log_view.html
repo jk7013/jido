@@ -49,7 +49,7 @@
       main {
         flex: 1;
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         gap: 16px;
         padding: 16px;
         min-height: 0;
@@ -64,61 +64,60 @@
         display: flex;
         flex-direction: column;
         min-height: calc(100vh - 200px);
-        max-width: 800px;
       }
 
       .timeline {
         position: relative;
         border-left: 2px solid var(--muted);
         padding-left: 18px;
+        margin-left: 8px;
         flex: 1;
         overflow-y: auto;
       }
 
       .entry {
-        margin-bottom: 16px;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        border-radius: 8px;
-        padding: 12px;
-        background: var(--bg);
-        border: 1px solid var(--muted);
-      }
-
-      .entry:hover {
-        background: var(--muted);
-        border-color: var(--accent);
-      }
-
-      .entry.expanded {
-        background: var(--panel);
-        border-color: var(--accent);
-      }
-
-      .summary {
-        font-weight: 600;
-        color: var(--accent);
-        margin-bottom: 4px;
-        font-size: 13px;
-      }
-
-      .time {
-        font-size: 11px;
-        color: var(--sub);
-        margin-bottom: 8px;
-      }
-
-      pre {
-        background: #0d1117;
-        border: 1px solid #21262d;
-        border-radius: 6px;
-        padding: 12px;
-        margin: 8px 0 0 0;
-        overflow-x: auto;
-        font-size: 12px;
-        line-height: 1.4;
-        color: #e6edf3;
         position: relative;
+        margin-bottom: 10px;
+        cursor: pointer;
+      }
+
+      .entry::before {
+        content: "";
+        position: absolute;
+        left: -25px;
+        top: 4px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+
+      .entry .summary {
+        font-weight: 500;
+        color: var(--text);
+        font-size: 14px;
+      }
+
+      .entry .time {
+        font-size: 12px;
+        color: var(--sub);
+      }
+
+      .entry pre {
+        display: none;
+        background: #0e1320;
+        border: 1px solid var(--muted);
+        padding: 8px 10px;
+        border-radius: 8px;
+        overflow-x: auto;
+        white-space: pre;
+        font-size: 13px;
+        margin-top: 6px;
+        position: relative;
+      }
+
+      .entry.expanded pre {
+        display: block;
       }
 
       pre button.ghost {
@@ -254,9 +253,32 @@
       // 싱글 모드 로그 데이터 (localStorage에서 가져오기)
       const singleRuns = JSON.parse(localStorage.getItem("single_runs") || "[]");
       
+      // 샘플 로그 데이터 (실제 데이터가 없을 때 사용)
+      const sampleLogs = {
+        single: [
+          {
+            type: "request",
+            timestamp: "2025-10-17 14:58:40,934",
+            data: {
+              model: "Konan-LLM-ENT-11",
+              user: "admin",
+              body: "안녕. 너는 어느회사 llm이니?",
+            },
+          },
+          {
+            type: "response",
+            timestamp: "2025-10-17 14:59:12,654",
+            data: {
+              output: "저는 코난테크놀로지의 Konect입니다.",
+              latency_ms: 2870,
+            },
+          },
+        ]
+      };
+      
       // 싱글 모드 로그를 LLM 형식으로 변환
       const logs = {
-        single: singleRuns.map((run, index) => ({
+        single: singleRuns.length > 0 ? singleRuns.map((run, index) => ({
           type: "Single Prompt",
           timestamp: new Date(run.time || Date.now()).toLocaleString(),
           data: {
@@ -267,7 +289,7 @@
             tokens: run.tok || 0,
             scores: run.scores || {}
           }
-        }))
+        })) : sampleLogs.single
       };
 
       function showTab(tabName) {
