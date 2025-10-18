@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Prompt A/B 결과 비교 (Markdown 렌더링)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<!-- Markdown 렌더링 & 하이라이트 (CDN). 폐쇄망이면 marked.min.js/hljs.min.js를 로컬로 내려받아 script src 교체 -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/styles/github-dark.min.css">
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/highlight.min.js"></script>
+<style>
+  :root{ --bg:#0f1115; --panel:#141a24; --muted:#243048; --text:#e7ebf3; --sub:#a6b1c5; --accent:#6aa6ff; --good:#33d49d; --bad:#ff6b6b; }
+  *{ box-sizing:border-box }
+  body{ margin:0; background:var(--bg); color:var(--text); font:15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial; }
+  header{ display:flex; gap:12px; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--muted); background:var(--panel); position:sticky; top:0; z-index:10}
+  h1{ margin:0; font-size:18px }
+  .controls{ display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+  select,input[type="range"]{ background:#0f1422; color:var(--text); border:1px solid #2a3856; border-radius:8px; padding:8px 10px }
+  button{ background:var(--accent); color:#0a1020; border:none; border-radius:8px; padding:9px 12px; font-weight:700; cursor:pointer }
+  button.ghost{ background:#1b2436; color:#cfe0ff; border:1px solid #2d3b5b }
+  .wrap{ display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:14px }
+  .panel{ background:var(--panel); border:1px solid var(--muted); border-radius:12px; overflow:hidden; display:flex; flex-direction:column; min-height: calc(100vh - 120px) }
+  .panel header{ display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px solid var(--muted); background:transparent; position:sticky; top:0 }
+  .meta{ display:flex; gap:10px; flex-wrap:wrap; color:var(--sub); font-size:12px }
+  .meta .pill{ padding:2px 8px; border-radius:999px; border:1px solid #33405c }
+  .content{ padding:14px; overflow:auto }
+  /* Markdown 스타일 */
+  .md{ max-width: 100%; }
+  .md h1,.md h2,.md h3{ border-bottom:1px dashed #2b395b; padding-bottom:6px }
+  .md pre, .md code{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace }
+  .md pre{ background:#0f1322; border:1px solid #263150; border-radius:10px; padding:12px; overflow:auto }
+  .md blockquote{ border-left:3px solid #2d3b5b; padding-left:10px; color:#c5cee0; background:#101628; border-radius:6px }
+  .md table{ width:100%; border-collapse:collapse; margin:12px 0 }
+  .md th,.md td{ border:1px solid #263150; padding:8px 10px }
+  .md th{ background:#10172a }
+  .sideTitle{ display:flex; align-items:center; gap:8px }
+  .sideTitle .dot{ width:10px; height:10px; border-radius:50% }
+  .dot.a{ background:var(--good) } .dot.b{ background:var(--bad) }
+  .big{ font-size: 16px }
+  @media (max-width: 1100px){ .wrap{ grid-template-columns:1fr } }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Prompt A/B 결과 비교</h1>
+    <div class="controls">
+      <label style="color:var(--sub);font-size:12px">실행 선택:</label>
+      <select id="runSelect"></select>
+      <button class="ghost" id="btnPrev">이전</button>
+      <button class="ghost" id="btnNext">다음</button>
+      <label style="color:var(--sub);font-size:12px;margin-left:8px">글자 크기</label>
+      <input type="range" id="fontRange" min="14" max="22" value="16" />
+      <button class="ghost" onclick="location.href='dashboard.html'">← 대시보드</button>
+      <button onclick="window.print()">인쇄/전체 저장</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- Left: A -->
+    <section class="panel" id="paneA">
+      <header>
+        <div class="sideTitle">
+          <span class="dot a"></span>
+          <strong id="titleA">Prompt A</strong>
+        </div>
+        <div class="meta">
+          <span class="pill" id="metaA1">Latency: -</span>
+          <span class="pill" id="metaA2">Tokens: -</span>
+          <span class="pill" id="metaA3">Faith/Rel/CtxP/CtxR: -</span>
+        </div>
+      </header>
+      <div class="content">
+        <article class="md big" id="mdA">A 결과 없음</article>
+      </div>
+    </section>
+
+    <!-- Right: B -->
+    <section class="panel" id="paneB">
+      <header>
+        <div class="sideTitle">
+          <span class="dot b"></span>
+          <strong id="titleB">Prompt B</strong>
+        </div>
+        <div class="meta">
+          <span class="pill" id="metaB1">Latency: -</span>
+          <span class="pill" id="metaB2">Tokens: -</span>
+          <span class="pill" id="metaB3">Faith/Rel/CtxP/CtxR: -</span>
+        </div>
+      </header>
+      <div class="content">
+        <article class="md big" id="mdB">B 결과 없음</article>
+      </div>
+    </section>
+  </div>
+
+<script>
+/* ---------- 데이터 로드 ---------- */
+const runs = JSON.parse(localStorage.getItem("ab_runs") || "[]");
+const runSelect = document.getElementById('runSelect');
+const titleA = document.getElementById('titleA');
+const titleB = document.getElementById('titleB');
+const mdA = document.getElementById('mdA');
+const mdB = document.getElementById('mdB');
+const metaA1 = document.getElementById('metaA1');
+const metaA2 = document.getElementById('metaA2');
+const metaA3 = document.getElementById('metaA3');
+const metaB1 = document.getElementById('metaB1');
+const metaB2 = document.getElementById('metaB2');
+const metaB3 = document.getElementById('metaB3');
+
+if(!runs.length){
+  mdA.textContent = "localStorage에 실행 결과(ab_runs)가 없습니다. 대시보드에서 먼저 테스트를 실행하세요.";
+  mdB.textContent = "—";
+}
+
+/* ---------- 드롭다운 구성 ---------- */
+function fillSelect(){
+  runSelect.innerHTML = "";
+  runs.forEach((r, idx)=>{
+    const o = document.createElement('option');
+    const ts = new Date(r.time || Date.now()).toLocaleString();
+    o.value = idx;
+    o.textContent = `#${idx+1} · ${ts} · ${r.promptA?.name || 'A'} vs ${r.promptB?.name || 'B'} · "${(r.query||'').slice(0,28)}"`;
+    runSelect.appendChild(o);
+  });
+  if(runs.length) runSelect.value = runs.length-1;
+}
+fillSelect();
+
+/* ---------- Markdown 렌더링 설정 ---------- */
+marked.setOptions({
+  breaks: true,
+  highlight: function(code, lang) {
+    try { return hljs.highlight(code, {language: lang}).value; }
+    catch(e){ return hljs.highlightAuto(code).value; }
+  }
+});
+
+/* ---------- 렌더 ---------- */
+function fmt(n){ return (typeof n === 'number') ? n.toFixed(2) : n; }
+
+function render(idx){
+  if(!runs.length) return;
+  const r = runs[idx];
+  // 타이틀/메타
+  titleA.textContent = r.promptA?.name || 'Prompt A';
+  titleB.textContent = r.promptB?.name || 'Prompt B';
+  metaA1.textContent = `Latency: ${r.latA} ms`;
+  metaA2.textContent = `Tokens: ${r.tokA}`;
+  metaA3.textContent = `Faith/Rel/CtxP/CtxR: ${fmt(r.scores?.A?.faithfulness)}/${fmt(r.scores?.A?.relevancy)}/${fmt(r.scores?.A?.ctxPrecision)}/${fmt(r.scores?.A?.ctxRecall)}`;
+  metaB1.textContent = `Latency: ${r.latB} ms`;
+  metaB2.textContent = `Tokens: ${r.tokB}`;
+  metaB3.textContent = `Faith/Rel/CtxP/CtxR: ${fmt(r.scores?.B?.faithfulness)}/${fmt(r.scores?.B?.relevancy)}/${fmt(r.scores?.B?.ctxPrecision)}/${fmt(r.scores?.B?.ctxRecall)}`;
+
+  // Markdown 본문 렌더 (ansA/ansB가 markdown이라고 가정)
+  mdA.innerHTML = marked.parse(r.ansA || "_(A 응답 없음)_");
+  mdB.innerHTML = marked.parse(r.ansB || "_(B 응답 없음)_");
+}
+if(runs.length) render(runs.length-1);
+
+/* ---------- 이벤트 ---------- */
+runSelect.addEventListener('change', e => render(+e.target.value));
+document.getElementById('btnPrev').addEventListener('click', ()=>{
+  if(!runs.length) return;
+  const i = Math.max(0, (+runSelect.value)-1);
+  runSelect.value = i; render(i);
+});
+document.getElementById('btnNext').addEventListener('click', ()=>{
+  if(!runs.length) return;
+  const i = Math.min(runs.length-1, (+runSelect.value)+1);
+  runSelect.value = i; render(i);
+});
+document.getElementById('fontRange').addEventListener('input', e=>{
+  const size = e.target.value + 'px';
+  document.querySelectorAll('.big').forEach(el => el.style.fontSize = size);
+});
+</script>
+</body>
+</html>

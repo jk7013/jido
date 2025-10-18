@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PromptOps 로그 뷰어</title>
+<style>
+:root {
+  --bg: #0f1115;
+  --panel: #161a22;
+  --muted: #232836;
+  --text: #e8ebf0;
+  --accent: #6aa6ff;
+  --a-color: #6aa6ff;
+  --b-color: #e084ff;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Fira Code", monospace;
+  margin: 0;
+}
+
+/* Header */
+header {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  background: #1a1f2c;
+  border-bottom: 1px solid var(--muted);
+}
+.tab {
+  padding: 10px 18px;
+  cursor: pointer;
+  user-select: none;
+  color: #9aa4b8;
+}
+.tab.active {
+  background: #232a3a;
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+}
+
+/* Panels */
+main {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px;
+}
+.panel {
+  flex: 1;
+  background: var(--panel);
+  border: 1px solid var(--muted);
+  border-radius: 10px;
+  padding: 16px;
+}
+h2 { font-size: 15px; margin-top: 0; color: #cfd7eb; }
+
+/* Timeline */
+.timeline {
+  position: relative;
+  border-left: 2px solid #2f364a;
+  padding-left: 18px;
+  margin-left: 8px;
+}
+.entry {
+  position: relative;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+.entry::before {
+  content: "";
+  position: absolute;
+  left: -25px;
+  top: 4px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+.entry.a::before { background: var(--a-color); }
+.entry.b::before { background: var(--b-color); }
+.entry .summary {
+  font-weight: 500;
+  color: #e0e4ee;
+}
+.entry .time {
+  font-size: 12px;
+  color: #a5adc0;
+}
+.entry pre {
+  display: none;
+  background: #111623;
+  padding: 8px 10px;
+  border-radius: 8px;
+  overflow-x: auto;
+  white-space: pre;
+  font-size: 13px;
+  margin-top: 6px;
+}
+.entry.expanded pre {
+  display: block;
+}
+
+/* JSON syntax colors */
+.json-key { color: #89c7ff; }
+.json-string { color: #a3e88b; }
+.json-number { color: #f0b97a; }
+.json-boolean { color: #f28db8; }
+.json-null { color: #999; }
+
+</style>
+</head>
+<body>
+<header>
+  <h1>PromptOps 로그 뷰어</h1>
+</header>
+
+<!-- 탭 메뉴 -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('llm')">LLM</div>
+  <div class="tab" onclick="showTab('rin')">RIN</div>
+  <div class="tab" onclick="showTab('rpc')">RPC</div>
+  <div class="tab" onclick="showTab('qry')">QRY</div>
+  <div class="tab" onclick="showTab('kql')">KQL</div>
+</div>
+
+<!-- 메인 영역 -->
+<main id="llm" class="tab-content active">
+  <section class="panel">
+    <h2>Prompt A</h2>
+    <div id="timelineA" class="timeline"></div>
+  </section>
+  <section class="panel">
+    <h2>Prompt B</h2>
+    <div id="timelineB" class="timeline"></div>
+  </section>
+</main>
+
+<!-- 다른 탭들 -->
+<main id="rin" class="tab-content" style="display:none">
+  <section class="panel"><h2>RIN 로그</h2><div id="rinLog"></div></section>
+</main>
+<main id="rpc" class="tab-content" style="display:none">
+  <section class="panel"><h2>RPC 로그</h2><div id="rpcLog"></div></section>
+</main>
+<main id="qry" class="tab-content" style="display:none">
+  <section class="panel"><h2>QRY 로그</h2><div id="qryLog"></div></section>
+</main>
+<main id="kql" class="tab-content" style="display:none">
+  <section class="panel"><h2>KQL 로그</h2><div id="kqlLog"></div></section>
+</main>
+
+<script>
+const logs = {
+  A: [
+    { timestamp: "2025-10-17 14:58:40,934", type: "request", data: { model:"Konan-LLM-ENT-11", user:"admin", body:"안녕. 너는 어느회사 llm이니?" } },
+    { timestamp: "2025-10-17 14:59:12,654", type: "response", data: { output:"저는 코난테크놀로지의 Konect입니다.", latency_ms:2870 } }
+  ],
+  B: [
+    { timestamp: "2025-10-17 14:58:40,945", type: "request", data: { model:"Konan-LLM-ENT-12", user:"admin", body:"안녕. 너는 어느회사 llm이니?" } },
+    { timestamp: "2025-10-17 14:59:15,200", type: "response", data: { output:"저는 Konan LLM-ENT-12 모델입니다.", latency_ms:3140 } }
+  ],
+  RIN: [
+    { timestamp:"2025-10-17 15:01:02", type:"INFO", data:{stage:"ranker", msg:"rerank 50 candidates"} },
+    { timestamp:"2025-10-17 15:01:04", type:"DEBUG", data:{duration_ms: 140, msg:"rerank completed"} }
+  ]
+};
+
+function syntaxHighlight(json) {
+  if (typeof json != "string") json = JSON.stringify(json, undefined, 2);
+  return json.replace(
+    /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(?:\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+    match => {
+      let cls = "json-number";
+      if (/^"/.test(match)) cls = /:$/.test(match) ? "json-key" : "json-string";
+      else if (/true|false/.test(match)) cls = "json-boolean";
+      else if (/null/.test(match)) cls = "json-null";
+      return `<span class="${cls}">${match}</span>`;
+    }
+  );
+}
+
+function renderTimeline(targetId, entries, sourceClass) {
+  const cont = document.getElementById(targetId);
+  entries.forEach(e => {
+    const div = document.createElement("div");
+    div.className = `entry ${sourceClass}`;
+    div.innerHTML = `
+      <div class="summary">${e.type}</div>
+      <div class="time">${e.timestamp}</div>
+      <pre>${syntaxHighlight(e.data)}</pre>
+    `;
+    div.addEventListener("click", () => {
+      div.classList.toggle("expanded");
+    });
+    cont.appendChild(div);
+  });
+}
+
+renderTimeline("timelineA", logs.A, "a");
+renderTimeline("timelineB", logs.B, "b");
+
+function renderGenericLogs(targetId, list) {
+  const cont = document.getElementById(targetId);
+  list.forEach(e => {
+    const div = document.createElement("div");
+    div.className = "entry";
+    div.innerHTML = `
+      <div class="summary">${e.type}</div>
+      <div class="time">${e.timestamp}</div>
+      <pre>${syntaxHighlight(e.data)}</pre>
+    `;
+    div.addEventListener("click", () => div.classList.toggle("expanded"));
+    cont.appendChild(div);
+  });
+}
+renderGenericLogs("rinLog", logs.RIN);
+
+// 탭 전환
+function showTab(id) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(c => (c.style.display = "none"));
+  document.querySelector(`.tab[onclick*="${id}"]`).classList.add("active");
+  document.getElementById(id).style.display = "flex";
+}
+</script>
+</body>
+</html>

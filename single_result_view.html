@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Prompt 결과 보기 (단일 프롬프트)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/styles/github-dark.min.css">
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/highlight.min.js"></script>
+<style>
+  :root{ --bg:#0f1115; --panel:#141a24; --muted:#243048; --text:#e7ebf3; --sub:#a6b1c5; --accent:#6aa6ff; --good:#33d49d; }
+  *{ box-sizing:border-box }
+  body{ margin:0; background:var(--bg); color:var(--text); font:15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial; }
+  header{ display:flex; gap:12px; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--muted); background:var(--panel); position:sticky; top:0; z-index:10}
+  h1{ margin:0; font-size:18px }
+  .controls{ display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+  select,input[type="range"]{ background:#0f1422; color:var(--text); border:1px solid #2a3856; border-radius:8px; padding:8px 10px }
+  button{ background:var(--accent); color:#0a1020; border:none; border-radius:8px; padding:9px 12px; font-weight:700; cursor:pointer }
+  button.ghost{ background:#1b2436; color:#cfe0ff; border:1px solid #2d3b5b }
+  .wrap{ padding:14px }
+  .panel{ background:var(--panel); border:1px solid var(--muted); border-radius:12px; overflow:hidden; display:flex; flex-direction:column; min-height: calc(100vh - 120px) }
+  .panel header{ display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px solid var(--muted); background:transparent; position:sticky; top:0 }
+  .meta{ display:flex; gap:10px; flex-wrap:wrap; color:var(--sub); font-size:12px }
+  .meta .pill{ padding:2px 8px; border-radius:999px; border:1px solid #33405c }
+  .content{ padding:14px; overflow:auto }
+  .md h1,.md h2,.md h3{ border-bottom:1px dashed #2b395b; padding-bottom:6px }
+  .md pre{ background:#0f1322; border:1px solid #263150; border-radius:10px; padding:12px; overflow:auto }
+  .md blockquote{ border-left:3px solid #2d3b5b; padding-left:10px; color:#c5cee0; background:#101628; border-radius:6px }
+  .md table{ width:100%; border-collapse:collapse; margin:12px 0 }
+  .md th,.md td{ border:1px solid #263150; padding:8px 10px }
+  .md th{ background:#10172a }
+  .sideTitle{ display:flex; align-items:center; gap:8px }
+  .sideTitle .dot{ width:10px; height:10px; border-radius:50%; background:var(--good); }
+  .big{ font-size:16px }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Prompt 결과 보기</h1>
+    <div class="controls">
+      <label style="color:var(--sub);font-size:12px">실행 선택:</label>
+      <select id="runSelect"></select>
+      <button class="ghost" id="btnPrev">이전</button>
+      <button class="ghost" id="btnNext">다음</button>
+      <label style="color:var(--sub);font-size:12px;margin-left:8px">글자 크기</label>
+      <input type="range" id="fontRange" min="14" max="22" value="16" />
+      <button class="ghost" onclick="location.href='dashboard.html'">← 대시보드</button>
+      <button onclick="window.print()">인쇄/전체 저장</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="panel">
+      <header>
+        <div class="sideTitle">
+          <span class="dot"></span>
+          <strong id="titleA">Prompt</strong>
+        </div>
+        <div class="meta">
+          <span class="pill" id="meta1">Latency: -</span>
+          <span class="pill" id="meta2">Tokens: -</span>
+          <span class="pill" id="meta3">Faith/Rel/CtxP/CtxR: -</span>
+        </div>
+      </header>
+      <div class="content">
+        <article class="md big" id="md">결과 없음</article>
+      </div>
+    </section>
+  </div>
+
+<script>
+const runs = JSON.parse(localStorage.getItem("single_runs") || "[]");
+const runSelect = document.getElementById('runSelect');
+const titleA = document.getElementById('titleA');
+const meta1 = document.getElementById('meta1');
+const meta2 = document.getElementById('meta2');
+const meta3 = document.getElementById('meta3');
+const md = document.getElementById('md');
+
+if(!runs.length){
+  md.textContent = "localStorage에 실행 결과(single_runs)가 없습니다. 대시보드에서 먼저 테스트를 실행하세요.";
+}
+
+function fillSelect(){
+  runSelect.innerHTML = "";
+  runs.forEach((r, idx)=>{
+    const o = document.createElement('option');
+    const ts = new Date(r.time || Date.now()).toLocaleString();
+    o.value = idx;
+    o.textContent = `#${idx+1} · ${ts} · ${(r.prompt?.name || 'Prompt')} · "${(r.query||'').slice(0,28)}"`;
+    runSelect.appendChild(o);
+  });
+  if(runs.length) runSelect.value = runs.length-1;
+}
+fillSelect();
+
+marked.setOptions({
+  breaks: true,
+  highlight: function(code, lang) {
+    try { return hljs.highlight(code, {language: lang}).value; }
+    catch(e){ return hljs.highlightAuto(code).value; }
+  }
+});
+
+function fmt(n){ return (typeof n === 'number') ? n.toFixed(2) : n; }
+
+function render(idx){
+  if(!runs.length) return;
+  const r = runs[idx];
+  titleA.textContent = r.prompt?.name || 'Prompt';
+  meta1.textContent = `Latency: ${r.lat} ms`;
+  meta2.textContent = `Tokens: ${r.tok}`;
+  meta3.textContent = `Faith/Rel/CtxP/CtxR: ${fmt(r.scores?.faithfulness)}/${fmt(r.scores?.relevancy)}/${fmt(r.scores?.ctxPrecision)}/${fmt(r.scores?.ctxRecall)}`;
+  md.innerHTML = marked.parse(r.answer || "_(응답 없음)_");
+}
+if(runs.length) render(runs.length-1);
+
+runSelect.addEventListener('change', e => render(+e.target.value));
+document.getElementById('btnPrev').addEventListener('click', ()=>{
+  if(!runs.length) return;
+  const i = Math.max(0, (+runSelect.value)-1);
+  runSelect.value = i; render(i);
+});
+document.getElementById('btnNext').addEventListener('click', ()=>{
+  if(!runs.length) return;
+  const i = Math.min(runs.length-1, (+runSelect.value)+1);
+  runSelect.value = i; render(i);
+});
+document.getElementById('fontRange').addEventListener('input', e=>{
+  const size = e.target.value + 'px';
+  document.querySelectorAll('.big').forEach(el => el.style.fontSize = size);
+});
+</script>
+</body>
+</html>
