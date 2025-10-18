@@ -150,6 +150,26 @@
   .single-mode .prompt-row { grid-template-columns: 1fr; }
   .single-mode .prompt-b-container { display: none; }
   
+  /* 실행 컨트롤 라인 */
+  .exec-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    gap: 10px;
+  }
+
+  .control-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .gitlab-link button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
   /* 버튼 */
   button {
     background: linear-gradient(180deg, #1a1f2b 0%, #0d111a 100%);

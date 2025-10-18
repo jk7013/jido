@@ -88,9 +88,24 @@
             </div>
           </div>
 
-          <div class="controls">
-            <button id="btnRun">A/B 실행</button>
-            <button class="ghost" id="btnClear">화면 초기화</button>
+          <div class="exec-controls">
+            <div class="control-buttons">
+              <button id="btnRun">A/B 실행</button>
+              <button class="ghost" id="btnClear">화면 초기화</button>
+            </div>
+            <div class="gitlab-link">
+              <button
+                class="ghost"
+                onclick="window.open('https://gitlab.company.local/promptops', '_blank')"
+              >
+                <img
+                  src="img/gitlab.svg"
+                  alt="GitLab"
+                  style="width:16px; vertical-align:middle; margin-right:4px;"
+                />
+                GitLab
+              </button>
+            </div>
           </div>
         </div>
       </section>
