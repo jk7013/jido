@@ -48,6 +48,9 @@
   .top-menu button {
     font-size: 13px;
     padding: 6px 11px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 
   /* 페이지별 보조 컨트롤 */
