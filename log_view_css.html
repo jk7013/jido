@@ -33,7 +33,20 @@
         border-bottom: 2px solid var(--accent);
       }
 
+      /* ✅ 화면 전체 높이 채우기 */
+      html,
+      body {
+        height: 100%;
+      }
+
+      body.log-view {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
       main {
+        flex: 1;
         display: flex;
         justify-content: space-between;
         gap: 16px;
@@ -45,6 +58,9 @@
         border: 1px solid var(--muted);
         border-radius: 10px;
         padding: 12px;
+        display: flex;
+        flex-direction: column;
+        min-height: calc(100vh - 120px);
       }
 
       .timeline {
@@ -52,6 +68,8 @@
         border-left: 2px solid var(--muted);
         padding-left: 18px;
         margin-left: 8px;
+        flex: 1;
+        overflow-y: auto;
       }
       .entry {
         position: relative;
@@ -116,7 +134,7 @@
     </style>
   </head>
 
-  <body>
+  <body class="log-view">
     <header>
       <h1>PromptOps 로그 뷰어</h1>
       <div class="right">
