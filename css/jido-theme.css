@@ -125,7 +125,7 @@
   .toggle-switch.active {
     background: #1a4a66;
     border-color: var(--accent);
-    box-shadow: 0 0 8px rgba(80, 227, 194, 0.3);
+    box-shadow: 0 0 12px rgba(80, 227, 194, 0.6), 0 0 24px rgba(80, 227, 194, 0.3);
   }
   
   .toggle-slider {
@@ -143,7 +143,7 @@
   .toggle-switch.active .toggle-slider {
     transform: translateX(20px);
     background: var(--accent);
-    box-shadow: 0 0 6px rgba(80, 227, 194, 0.5);
+    box-shadow: 0 0 10px rgba(80, 227, 194, 0.8), 0 0 20px rgba(80, 227, 194, 0.4);
   }
   
   .toggle-label {
