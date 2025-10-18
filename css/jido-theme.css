@@ -1,0 +1,401 @@
+:root {
+    --bg: #0B1220;
+    --panel: #121826;
+    --muted: #1B2333;
+    --text: #E6F2FF;
+    --sub: #7E8DA4;
+    --accent: #8BE9FD;
+    --good: #3EEBAA;
+    --warn: #FFC857;
+    --bad: #FF6B6B;
+  }
+  
+  /* 기본 레이아웃 */
+  * { box-sizing: border-box; }
+  
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial;
+  }
+  
+  header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--muted);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  header h1 {
+    font-size: 18px;
+    margin: 0;
+  }
+  
+  /* 토글 스위치 */
+  .toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 22px;
+    background: var(--muted);
+    border: 1px solid #2a3042;
+    border-radius: 11px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .toggle-switch.active {
+    background: #1a4a66;
+    border-color: var(--accent);
+  }
+  
+  .toggle-slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: var(--sub);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+  
+  .toggle-switch.active .toggle-slider {
+    transform: translateX(20px);
+    background: var(--accent);
+  }
+  
+  .toggle-label {
+    font-size: 12px;
+    color: var(--sub);
+    font-weight: 500;
+  }
+  
+  /* 패널 */
+  .wrap {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 14px;
+    padding: 16px;
+  }
+  
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--muted);
+    border-radius: 10px;
+    box-shadow: 0 1px 0 #0002;
+  }
+  
+  .panel h2 {
+    margin: 0;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--muted);
+    font-size: 14px;
+    color: #c9d4e3;
+  }
+  
+  .content { padding: 14px; }
+  
+  /* 입력 필드 */
+  label {
+    display: block;
+    margin: 8px 0 6px;
+    color: var(--sub);
+    font-size: 12px;
+  }
+  
+  input[type="text"],
+  textarea,
+  select {
+    width: 100%;
+    background: #111623;
+    color: var(--text);
+    border: 1px solid #2a3042;
+    border-radius: 8px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 6px rgba(139, 233, 253, 0.3);
+  }
+  
+  textarea {
+    min-height: 84px;
+    resize: vertical;
+  }
+  
+  /* 프롬프트 입력 */
+  .prompt-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    transition: all 0.3s ease;
+  }
+  
+  .single-mode .prompt-row { grid-template-columns: 1fr; }
+  .single-mode .prompt-b-container { display: none; }
+  
+  /* 버튼 */
+  button {
+    background: linear-gradient(180deg, #1a1f2b 0%, #0d111a 100%);
+    border: 1px solid #27324a;
+    color: #eaf6ff;
+    font-weight: 600;
+    padding: 7px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.25s ease;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+  }
+  
+  button:hover {
+    background: linear-gradient(180deg, #1f2736 0%, #141924 100%);
+    border-color: #4ab9d8;
+    color: #b7ecff;
+    box-shadow: 0 0 10px rgba(139, 233, 253, 0.25);
+    transform: translateY(-1px);
+  }
+  
+  button:active {
+    background: linear-gradient(180deg, #121620 0%, #0b0f18 100%);
+    box-shadow: 0 0 6px rgba(139, 233, 253, 0.2);
+    transform: translateY(0);
+  }
+  
+  button.ghost {
+    background: transparent;
+    color: #8BE9FD;
+    border: 1px solid #2f3a55;
+    font-weight: 500;
+    padding: 6px 11px;
+    transition: all 0.25s ease;
+  }
+  
+  button.ghost:hover {
+    background: linear-gradient(180deg, rgba(20, 30, 40, 0.8), rgba(15, 20, 30, 0.95));
+    border-color: #8BE9FD;
+    color: #c8f5ff;
+    box-shadow: 0 0 8px rgba(139, 233, 253, 0.25);
+  }
+  
+  /* 카드, 테이블, 기타 */
+  .card {
+    background: #101524;
+    border: 1px solid #21263a;
+    border-radius: 10px;
+    padding: 12px;
+  }
+  
+  .table, th, td {
+    border-bottom: 1px solid #23304b;
+  }
+  
+  .bar {
+    height: 8px;
+    background: #1a2133;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  
+  .bar > span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #00B3FF, #8BE9FD);
+  }
+  
+  footer {
+    padding: 10px 16px;
+    border-top: 1px solid var(--muted);
+    color: #a8b4c9;
+    font-size: 12px;
+  }
+  
+  /* ▼▼▼ 추가: 실행 로그 & 집계 테이블 복원용 ▼▼▼ */
+
+/* 프롬프트 카드와 로그 테이블 간 간격 */
+.cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    transition: all 0.3s ease;
+  }
+  .single-mode .cards { grid-template-columns: 1fr; }
+  .single-mode .card-b { display: none; }
+  
+  .similarity-section {
+    margin-top: 10px;
+    transition: all 0.3s ease;
+  }
+  .single-mode .similarity-section { display: none; }
+  
+  /* 코드 출력 박스 */
+  pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: #0e1320;
+    border: 1px solid #21263a;
+    padding: 10px;
+    border-radius: 8px;
+    max-height: 220px;
+    overflow: auto;
+  }
+  
+  /* 로그/집계 테이블 */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+  }
+  th, td {
+    border-bottom: 1px solid #23304b;
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 13px;
+  }
+  th {
+    color: #cbd6ea;
+    font-weight: 600;
+    background: #13192a;
+    position: sticky;
+    top: 0;
+  }
+  .metric { font-variant-numeric: tabular-nums; }
+  
+  /* 집계 카드 */
+  .card {
+    background: #101524;
+    border: 1px solid #21263a;
+    border-radius: 10px;
+    padding: 12px;
+  }
+  
+  /* pill 색상 */
+  .pill { padding: 2px 8px; border-radius: 999px; font-size: 12px; display: inline-block; }
+  .ok  { background: #0f2b22; border: 1px solid #1b6f52; color: #98ffd1; }
+  .meh { background: #2b260f; border: 1px solid #6f5e1b; color: #ffe398; }
+  .bad { background: #2b0f12; border: 1px solid #6f1b1b; color: #ffb0b0; }
+  
+  /* 하단 전체 폭 */
+  .panel[style*="grid-column: 1 / -1"] {
+    grid-column: 1 / -1;
+  }
+  
+  /* A/B 대시보드 패널 균형 유지 */
+.wrap {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr; /* 항상 동일 비율 유지 */
+    gap: 14px;
+    padding: 16px;
+    align-items: start;
+  }
+  
+  /* 싱글 모드에서도 패널 비율 유지 (단, 내부만 축소) */
+  .single-mode .wrap {
+    grid-template-columns: 1.1fr 1fr; /* 변경 없음 */
+  }
+  
+  html {
+    overflow-y: scroll; /* 스크롤바 항상 표시 → 폭 흔들림 방지 */
+  }
+  
+ /* ---------- Result View 레이아웃 교정 ---------- */
+
+/* 헤더 오른쪽 버튼 영역 (전역 영향 無) */
+body.result-view header .right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  
+  /* 결과 패널 두 개를 전체 너비로 균등 배치 */
+  body.result-view .wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* 패널 안의 콘텐츠는 가득 차도록 */
+  body.result-view .panel {
+    flex: 1;
+    width: 100%;
+  }
+  
+  /* 반응형 (좁은 화면일 때 세로 전환) */
+  @media (max-width: 1100px) {
+    body.result-view .wrap {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* range input 시각 보정 */
+  body.result-view input[type="range"] {
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+  
+
+  /* ---------- Result View 통일형 레이아웃 ---------- */
+body.result-view header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--muted);
+  }
+  
+  body.result-view header h1 {
+    font-size: 16px;
+    color: var(--text);
+    margin: 0;
+  }
+  
+  body.result-view header .right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  
+  body.result-view .wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  body.result-view .panel {
+    background: var(--panel);
+    border: 1px solid var(--muted);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: 0 1px 0 #0002;
+  }
+  
+  @media (max-width: 1100px) {
+    body.result-view .wrap {
+      grid-template-columns: 1fr;
+    }
+  }
+  
