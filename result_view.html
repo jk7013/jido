@@ -64,14 +64,50 @@
         border-bottom: 1px solid var(--muted);
       }
 
-      /* 헤더 컨트롤 요소들이 한 줄로 표시되도록 (대시보드와 완전 동일) */
+      /* 헤더 컨트롤 요소들이 한 줄로 표시되도록 */
       body.result-view header .right {
         display: flex;
         align-items: center;
         gap: 8px;
         flex-wrap: nowrap;
         min-width: 0;
-        white-space: nowrap;
+      }
+
+      body.result-view header .right select {
+        min-width: 200px;
+        max-width: 300px;
+      }
+
+      body.result-view header .right input[type="range"] {
+        min-width: 80px;
+        max-width: 120px;
+      }
+
+      /* single_result_view.html과 완전히 동일한 헤더 스타일 */
+      body.result-view header {
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--muted);
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--panel);
+      }
+
+      body.result-view header h1 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+        color: var(--text);
+      }
+
+      /* single_result_view.html과 완전히 동일한 헤더 컨트롤 스타일 */
+      body.result-view header .right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: nowrap;
+        min-width: 0;
       }
 
       body.result-view header .right select {
@@ -113,6 +149,13 @@
         padding: 6px 11px;
       }
 
+      body.result-view header .right label {
+        color: var(--sub);
+        font-size: 12px;
+        white-space: nowrap;
+        margin: 0;
+      }
+
       /* 상태 점 스타일 */
       .status-dot {
         display: inline-block;
@@ -128,31 +171,6 @@
 
       .status-dot.bad {
         background: var(--bad);
-      }
-
-      body.result-view header .right label {
-        color: var(--sub);
-        font-size: 12px;
-        white-space: nowrap;
-        margin: 0;
-      }
-
-      /* 대시보드와 완전히 동일한 헤더 스타일 */
-      body.result-view header {
-        padding: 18px 22px;
-        border-bottom: 1px solid var(--muted);
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        justify-content: space-between;
-        background: var(--panel);
-      }
-
-      body.result-view header h1 {
-        font-size: 18px;
-        font-weight: 600;
-        margin: 0;
-        color: var(--text);
       }
 
       body.result-view .panel header {
@@ -184,8 +202,8 @@
         });
     </script>
 
-    <div class="result-controls">
-      <h2>Prompt A/B 결과 비교</h2>
+    <header>
+      <h1>Prompt A/B 결과 비교</h1>
       <div class="right">
         <label style="color: var(--sub); font-size: 12px">실행 선택:</label>
         <select id="runSelect"></select>
@@ -198,9 +216,9 @@
         <button class="ghost" onclick="location.href='dashboard.html'">
           ← 대시보드
         </button>
-        <button>인쇄/전체 저장</button>
+        <button onclick="window.print()">인쇄/전체 저장</button>
       </div>
-    </div>
+    </header>
 
     <main class="wrap">
       <!-- A/B 비교 결과 -->
