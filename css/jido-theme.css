@@ -115,12 +115,12 @@
     position: relative;
     width: 40px;
     height: 18px;
-    background: var(--muted);
-    border: 1px solid #2a3042;
+    background: #1a4a66;
+    border: 1px solid var(--accent);
     border-radius: 9px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 0 6px rgba(80, 227, 194, 0.2);
+    box-shadow: 0 0 8px rgba(80, 227, 194, 0.3);
   }
   
   .toggle-switch.active {
@@ -135,10 +135,10 @@
     left: 1px;
     width: 14px;
     height: 14px;
-    background: var(--sub);
+    background: var(--accent);
     border-radius: 50%;
     transition: all 0.3s ease;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 0 4px rgba(80, 227, 194, 0.3);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 0 6px rgba(80, 227, 194, 0.5);
   }
   
   .toggle-switch.active .toggle-slider {
