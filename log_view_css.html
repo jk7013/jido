@@ -139,6 +139,7 @@
 
   <body class="log-view">
     <div id="header-placeholder"></div>
+    <div id="return-container"></div>
 
     <script>
       fetch("components/header.html")
@@ -164,6 +165,12 @@
             </header>
           `;
         });
+    </script>
+
+    <script>
+      fetch("components/return-bar.html")
+        .then(r => r.text())
+        .then(html => document.getElementById('return-container').innerHTML = html);
     </script>
 
     <!-- 탭 메뉴 -->
@@ -282,7 +289,7 @@
           div.innerHTML = `
             <div class="summary">${e.type}</div>
             <div class="time">${e.timestamp}</div>
-            <pre>${syntaxHighlight(e.data)}</pre>
+            <pre>${syntaxHighlight(e.data)}<button class="ghost" onclick="navigator.clipboard.writeText(JSON.stringify(e.data, null, 2))">복사</button></pre>
           `;
           div.addEventListener("click", () => {
             div.classList.toggle("expanded");

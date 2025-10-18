@@ -304,6 +304,16 @@
     font-size: 18px;
   }
 
+  /* JSON 코드블럭 UX 개선 */
+  pre { 
+    position: relative; 
+  }
+  pre button.ghost { 
+    position: absolute; 
+    top: 6px; 
+    right: 6px; 
+  }
+
   /* 버튼 */
   button {
     background: linear-gradient(180deg, #1a1f2b 0%, #0d111a 100%);
