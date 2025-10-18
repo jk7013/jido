@@ -31,12 +31,23 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    min-width: 100%;
+    overflow-x: auto;
   }
   
   header h1 {
     font-size: 18px;
     margin: 0;
     color: var(--text);
+  }
+
+  header .right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    min-width: 0;
   }
 
   .top-menu {
