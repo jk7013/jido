@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>PromptOps 싱글 로그 뷰어</title>
+    <!-- ✅ 공통 테마 적용 -->
+    <link rel="stylesheet" href="css/jido-theme.css" />
+
+    <style>
+      /* 로그뷰 전용 추가 스타일 */
+      body {
+        font-family: "Fira Code", "Noto Sans KR", monospace;
+      }
+
+      .tabs {
+        display: flex;
+        background: var(--panel);
+        border-bottom: 1px solid var(--muted);
+      }
+      .tab {
+        padding: 12px 18px;
+        cursor: pointer;
+        user-select: none;
+        color: var(--sub);
+        transition: color 0.25s ease;
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .tab.active {
+        background: var(--muted);
+        color: var(--accent);
+        border-bottom: 2px solid var(--accent);
+      }
+
+      /* ✅ 화면 전체 높이 채우기 */
+      html,
+      body {
+        height: 100%;
+      }
+
+      body.single-log-view {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        padding-top: 0;
+      }
+
+      main {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        padding: 16px;
+        min-height: 0;
+        overflow: hidden;
+      }
+      .panel {
+        flex: 1;
+        background: var(--panel);
+        border: 1px solid var(--muted);
+        border-radius: 10px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        min-height: calc(100vh - 200px);
+        max-width: 800px;
+      }
+
+      .timeline {
+        position: relative;
+        border-left: 2px solid var(--muted);
+        padding-left: 18px;
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      .entry {
+        margin-bottom: 16px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        border-radius: 8px;
+        padding: 12px;
+        background: var(--bg);
+        border: 1px solid var(--muted);
+      }
+
+      .entry:hover {
+        background: var(--muted);
+        border-color: var(--accent);
+      }
+
+      .entry.expanded {
+        background: var(--panel);
+        border-color: var(--accent);
+      }
+
+      .summary {
+        font-weight: 600;
+        color: var(--accent);
+        margin-bottom: 4px;
+        font-size: 13px;
+      }
+
+      .time {
+        font-size: 11px;
+        color: var(--sub);
+        margin-bottom: 8px;
+      }
+
+      pre {
+        background: #0d1117;
+        border: 1px solid #21262d;
+        border-radius: 6px;
+        padding: 12px;
+        margin: 8px 0 0 0;
+        overflow-x: auto;
+        font-size: 12px;
+        line-height: 1.4;
+        color: #e6edf3;
+        position: relative;
+      }
+
+      pre button.ghost {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .entry.a {
+        border-left: 3px solid var(--good);
+      }
+
+      .entry.b {
+        border-left: 3px solid var(--bad);
+      }
+
+      .entry.single {
+        border-left: 3px solid var(--accent);
+      }
+
+      .json-key {
+        color: #79c0ff;
+      }
+      .json-string {
+        color: #a5d6ff;
+      }
+      .json-number {
+        color: #79c0ff;
+      }
+      .json-boolean {
+        color: #ff7b72;
+      }
+      .json-null {
+        color: var(--sub);
+      }
+    </style>
+  </head>
+
+  <body class="single-log-view">
+    <div id="header-placeholder"></div>
+    <div id="return-container"></div>
+
+    <script>
+      fetch("components/header.html")
+        .then((res) => res.text())
+        .then((html) => {
+          document.getElementById("header-placeholder").innerHTML = html;
+        })
+        .catch((error) => {
+          console.error("헤더 로딩 실패:", error);
+          // 대안: 직접 헤더 HTML 삽입
+          document.getElementById("header-placeholder").innerHTML = `
+            <header>
+              <h1>PromptOps</h1>
+              <nav class="top-menu">
+                <button class="ghost" onclick="location.href='dashboard.html'">대시보드</button>
+                <button class="ghost" onclick="location.href='single_result_view.html'">결과 보기</button>
+                <button class="ghost" onclick="location.href='single_log_view.html'">로그 보기</button>
+                <button class="ghost" onclick="window.open('https://gitlab.company.local/promptops', '_blank')">
+                  <img src="img/gitlab.svg" alt="GitLab" style="width:16px; vertical-align:middle; margin-right:4px;" />
+                  GitLab
+                </button>
+              </nav>
+            </header>
+          `;
+        });
+    </script>
+
+    <script>
+      fetch("components/return-bar.html")
+        .then(r => r.text())
+        .then(html => document.getElementById('return-container').innerHTML = html);
+    </script>
+
+    <!-- 탭 메뉴 -->
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('llm')">LLM</div>
+      <div class="tab" onclick="showTab('rin')">RIN</div>
+      <div class="tab" onclick="showTab('rpc')">RPC</div>
+      <div class="tab" onclick="showTab('qry')">QRY</div>
+      <div class="tab" onclick="showTab('kql')">KQL</div>
+    </div>
+
+    <!-- 메인 영역 -->
+    <main id="llm" class="tab-content active">
+      <section class="panel">
+        <h2>Single Prompt</h2>
+        <div id="timeline" class="timeline"></div>
+      </section>
+    </main>
+
+    <main id="rin" class="tab-content">
+      <section class="panel">
+        <h2>RIN Logs</h2>
+        <div id="timelineRin" class="timeline"></div>
+      </section>
+    </main>
+
+    <main id="rpc" class="tab-content">
+      <section class="panel">
+        <h2>RPC Logs</h2>
+        <div id="timelineRpc" class="timeline"></div>
+      </section>
+    </main>
+
+    <main id="qry" class="tab-content">
+      <section class="panel">
+        <h2>QRY Logs</h2>
+        <div id="timelineQry" class="timeline"></div>
+      </section>
+    </main>
+
+    <main id="kql" class="tab-content">
+      <section class="panel">
+        <h2>KQL Logs</h2>
+        <div id="timelineKql" class="timeline"></div>
+      </section>
+    </main>
+
+    <footer>
+      LLM · RIN · RPC 등 각 엔진 로그를 시각적으로 비교 – 클릭 시 세부 JSON 표시
+    </footer>
+
+    <script>
+      // 싱글 모드 로그 데이터 (localStorage에서 가져오기)
+      const singleRuns = JSON.parse(localStorage.getItem("single_runs") || "[]");
+      
+      // 싱글 모드 로그를 LLM 형식으로 변환
+      const logs = {
+        single: singleRuns.map((run, index) => ({
+          type: "Single Prompt",
+          timestamp: new Date(run.time || Date.now()).toLocaleString(),
+          data: {
+            prompt: run.prompt?.name || "Single Prompt",
+            query: run.query || "",
+            answer: run.answer || "",
+            latency: run.lat || 0,
+            tokens: run.tok || 0,
+            scores: run.scores || {}
+          }
+        }))
+      };
+
+      function showTab(tabName) {
+        // 모든 탭 비활성화
+        document.querySelectorAll(".tab").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+        document.querySelectorAll(".tab-content").forEach((content) => {
+          content.classList.remove("active");
+        });
+
+        // 선택된 탭 활성화
+        document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add("active");
+        document.getElementById(tabName).classList.add("active");
+      }
+
+      function syntaxHighlight(json) {
+        if (typeof json != "string") json = JSON.stringify(json, undefined, 2);
+        return json.replace(
+          /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(?:\\s*:)?|\\b(true|false|null)\\b|-?\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?)/g,
+          (match) => {
+            let cls = "json-number";
+            if (/^"/.test(match))
+              cls = /:$/.test(match) ? "json-key" : "json-string";
+            else if (/true|false/.test(match)) cls = "json-boolean";
+            else if (/null/.test(match)) cls = "json-null";
+            return `<span class="${cls}">${match}</span>`;
+          }
+        );
+      }
+
+      function renderTimeline(targetId, entries, sourceClass) {
+        const cont = document.getElementById(targetId);
+        entries.forEach((e) => {
+          const div = document.createElement("div");
+          div.className = `entry ${sourceClass}`;
+          div.innerHTML = `
+            <div class="summary">${e.type}</div>
+            <div class="time">${e.timestamp}</div>
+            <pre>${syntaxHighlight(e.data)}<button class="ghost" onclick="navigator.clipboard.writeText(JSON.stringify(e.data, null, 2))">복사</button></pre>
+          `;
+          div.addEventListener("click", () => {
+            div.classList.toggle("expanded");
+          });
+          cont.appendChild(div);
+        });
+      }
+
+      // 싱글 로그 렌더링
+      renderTimeline("timeline", logs.single, "single");
+
+      // 빈 탭들에 대한 기본 메시지
+      const emptyTabs = ["timelineRin", "timelineRpc", "timelineQry", "timelineKql"];
+      emptyTabs.forEach(tabId => {
+        const cont = document.getElementById(tabId);
+        cont.innerHTML = '<div class="empty">해당 엔진의 로그가 없습니다.</div>';
+      });
+    </script>
+  </body>
+</html>
