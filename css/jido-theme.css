@@ -56,6 +56,17 @@
     padding: 12px 22px;
     border-bottom: 1px solid var(--muted);
     background: var(--panel);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .dashboard-controls h2,
+  .result-controls h2 {
+    font-size: 16px;
+    margin: 0;
+    color: var(--text);
+    font-weight: 600;
   }
 
   .dashboard-controls .right,
