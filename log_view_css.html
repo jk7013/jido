@@ -135,12 +135,15 @@
   </head>
 
   <body class="log-view">
-    <header>
-      <h1>PromptOps 로그 뷰어</h1>
-      <div class="right">
-        <button class="ghost" onclick="location.href='dashboard.html'">A/B 테스트로 돌아가기</button>
-      </div>
-    </header>
+    <div id="header-placeholder"></div>
+
+    <script>
+      fetch("components/header.html")
+        .then((res) => res.text())
+        .then((html) => {
+          document.getElementById("header-placeholder").innerHTML = html;
+        });
+    </script>
 
     <!-- 탭 메뉴 -->
     <div class="tabs">

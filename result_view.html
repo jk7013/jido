@@ -150,8 +150,17 @@
   </head>
 
   <body class="result-view">
-    <header>
-      <h1>Prompt A/B 결과 비교</h1>
+    <div id="header-placeholder"></div>
+
+    <script>
+      fetch("components/header.html")
+        .then((res) => res.text())
+        .then((html) => {
+          document.getElementById("header-placeholder").innerHTML = html;
+        });
+    </script>
+
+    <div class="result-controls">
       <div class="right">
         <label style="color: var(--sub); font-size: 12px">실행 선택:</label>
         <select id="runSelect"></select>
@@ -166,7 +175,7 @@
         </button>
         <button>인쇄/전체 저장</button>
       </div>
-    </header>
+    </div>
 
     <main class="wrap">
       <!-- Prompt A -->

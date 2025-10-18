@@ -8,14 +8,23 @@
 </head>
 
   <body>
-    <header>
-      <h1>Prompt A/B 테스트 대시보드</h1>
+    <div id="header-placeholder"></div>
+
+    <script>
+      fetch("components/header.html")
+        .then((res) => res.text())
+        .then((html) => {
+          document.getElementById("header-placeholder").innerHTML = html;
+        });
+    </script>
+
+    <div class="dashboard-controls">
       <div class="right">
         <button class="ghost" id="btnExport">CSV로 내보내기</button>
         <button class="ghost" id="btnResultView">결과 보기</button>
         <span class="muted" id="runCount">runs: 0</span>
       </div>
-    </header>
+    </div>
 
     <div class="wrap">
       <!-- 좌: 컨트롤 -->

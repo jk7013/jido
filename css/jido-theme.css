@@ -21,10 +21,14 @@
   }
   
   header {
-    padding: 18px 22px;
+    background: var(--panel);
     border-bottom: 1px solid var(--muted);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 18px 22px;
     display: flex;
-    gap: 12px;
     align-items: center;
     justify-content: space-between;
   }
@@ -32,6 +36,34 @@
   header h1 {
     font-size: 18px;
     margin: 0;
+    color: var(--text);
+  }
+
+  .top-menu {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .top-menu button {
+    font-size: 13px;
+    padding: 6px 11px;
+  }
+
+  /* 페이지별 보조 컨트롤 */
+  .dashboard-controls,
+  .result-controls {
+    padding: 12px 22px;
+    border-bottom: 1px solid var(--muted);
+    background: var(--panel);
+  }
+
+  .dashboard-controls .right,
+  .result-controls .right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
   }
   
   /* 토글 스위치 */
