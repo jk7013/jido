@@ -57,7 +57,7 @@
         border-bottom: 1px solid var(--muted);
       }
 
-      /* 헤더 컨트롤 요소들이 한 줄로 표시되도록 (대시보드와 동일) */
+      /* 헤더 컨트롤 요소들이 한 줄로 표시되도록 (대시보드와 완전 동일) */
       body.result-view header .right {
         display: flex;
         align-items: center;
@@ -68,25 +68,49 @@
       }
 
       body.result-view header .right select {
-        min-width: 180px;
-        max-width: 250px;
+        background: #111623;
+        color: var(--text);
+        border: 1px solid #2a3042;
+        border-radius: 8px;
+        padding: 7px 10px;
         font-size: 13px;
+        min-width: 200px;
+        max-width: 300px;
       }
 
       body.result-view header .right input[type="range"] {
-        min-width: 60px;
-        max-width: 100px;
+        min-width: 80px;
+        max-width: 120px;
+        accent-color: var(--accent);
       }
 
       body.result-view header .right button {
+        background: linear-gradient(180deg, #1a1f2b 0%, #0d111a 100%);
+        border: 1px solid #27324a;
+        color: #eaf6ff;
+        font-weight: 600;
+        padding: 7px 12px;
+        border-radius: 6px;
         font-size: 13px;
-        padding: 6px 10px;
         white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+      }
+
+      body.result-view header .right button.ghost {
+        background: transparent;
+        color: var(--accent);
+        border: 1px solid #2f3a55;
+        font-weight: 500;
+        padding: 6px 11px;
       }
 
       body.result-view header .right label {
+        color: var(--sub);
         font-size: 12px;
         white-space: nowrap;
+        margin: 0;
       }
 
       /* 대시보드와 완전히 동일한 헤더 스타일 */
