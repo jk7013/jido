@@ -27,7 +27,7 @@
               <div class="right">
                 <button class="ghost" id="btnExport">CSV로 내보내기</button>
                 <button class="ghost" id="btnResultView">결과 보기</button>
-                <button class="ghost" onclick="location.href='log_view_css.html'">
+                <button class="ghost" id="btnLogView">
                   로그 보기
                 </button>
                 <button
@@ -705,6 +705,21 @@
             } else {
               // A/B Mode일 때 result_view.html로 이동
               location.href = 'result_view.html';
+            }
+          });
+        }
+
+        // 로그보기 버튼 - 모드에 따라 적절한 페이지로 이동
+        const btnLogView = document.getElementById("btnLogView");
+        if (btnLogView) {
+          btnLogView.addEventListener("click", () => {
+            console.log("로그보기 버튼 클릭, 현재 모드:", state.isSingleMode ? "Single" : "A/B");
+            if (state.isSingleMode) {
+              // Single Mode일 때 single_log_view.html로 이동 (싱글 로그뷰)
+              location.href = 'single_log_view.html';
+            } else {
+              // A/B Mode일 때 log_view_css.html로 이동 (A/B 로그뷰)
+              location.href = 'log_view_css.html';
             }
           });
         }
