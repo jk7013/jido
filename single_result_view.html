@@ -31,6 +31,8 @@
       main.wrap {
         flex: 1;
         padding: 16px;
+        display: flex;
+        flex-direction: column;
       }
 
       section.panel {
@@ -40,6 +42,7 @@
         box-shadow: 0 1px 0 #0002;
         display: flex;
         flex-direction: column;
+        flex: 1;
         min-height: calc(100vh - 120px);
       }
 
@@ -76,14 +79,36 @@
         max-width: 120px;
       }
 
-      /* 대시보드와 통일성을 위한 추가 스타일 */
+      /* result_view.html과 통일성을 위한 헤더 스타일 */
       body.single-result-view header {
         padding: 18px 22px;
+        border-bottom: 1px solid var(--muted);
+        background: var(--panel);
       }
 
       body.single-result-view header h1 {
         font-size: 18px;
         font-weight: 600;
+        margin: 0;
+        color: var(--text);
+      }
+
+      body.single-result-view header .right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: nowrap;
+        min-width: 0;
+      }
+
+      body.single-result-view header .right select {
+        min-width: 200px;
+        max-width: 300px;
+      }
+
+      body.single-result-view header .right input[type="range"] {
+        min-width: 80px;
+        max-width: 120px;
       }
 
       article.md.big {
