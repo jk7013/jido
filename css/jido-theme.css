@@ -202,16 +202,7 @@
     gap: 10px;
   }
 
-  .control-buttons {
-    display: flex;
-    gap: 8px;
-  }
 
-  .gitlab-link button {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
 
   /* 버튼 */
   button {
