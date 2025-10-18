@@ -79,10 +79,14 @@
         max-width: 120px;
       }
 
-      /* result_view.html과 통일성을 위한 헤더 스타일 */
+      /* 대시보드와 완전히 동일한 헤더 스타일 */
       body.single-result-view header {
         padding: 18px 22px;
         border-bottom: 1px solid var(--muted);
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
         background: var(--panel);
       }
 
@@ -99,16 +103,29 @@
         gap: 8px;
         flex-wrap: nowrap;
         min-width: 0;
+        white-space: nowrap;
       }
 
       body.single-result-view header .right select {
-        min-width: 200px;
-        max-width: 300px;
+        min-width: 180px;
+        max-width: 250px;
+        font-size: 13px;
       }
 
       body.single-result-view header .right input[type="range"] {
-        min-width: 80px;
-        max-width: 120px;
+        min-width: 60px;
+        max-width: 100px;
+      }
+
+      body.single-result-view header .right button {
+        font-size: 13px;
+        padding: 6px 10px;
+        white-space: nowrap;
+      }
+
+      body.single-result-view header .right label {
+        font-size: 12px;
+        white-space: nowrap;
       }
 
       article.md.big {

@@ -57,33 +57,54 @@
         border-bottom: 1px solid var(--muted);
       }
 
-      /* 헤더 컨트롤 요소들이 한 줄로 표시되도록 */
+      /* 헤더 컨트롤 요소들이 한 줄로 표시되도록 (대시보드와 동일) */
       body.result-view header .right {
         display: flex;
         align-items: center;
         gap: 8px;
         flex-wrap: nowrap;
         min-width: 0;
+        white-space: nowrap;
       }
 
       body.result-view header .right select {
-        min-width: 200px;
-        max-width: 300px;
+        min-width: 180px;
+        max-width: 250px;
+        font-size: 13px;
       }
 
       body.result-view header .right input[type="range"] {
-        min-width: 80px;
-        max-width: 120px;
+        min-width: 60px;
+        max-width: 100px;
       }
 
-      /* 대시보드와 통일성을 위한 추가 스타일 */
+      body.result-view header .right button {
+        font-size: 13px;
+        padding: 6px 10px;
+        white-space: nowrap;
+      }
+
+      body.result-view header .right label {
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      /* 대시보드와 완전히 동일한 헤더 스타일 */
       body.result-view header {
         padding: 18px 22px;
+        border-bottom: 1px solid var(--muted);
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--panel);
       }
 
       body.result-view header h1 {
         font-size: 18px;
         font-weight: 600;
+        margin: 0;
+        color: var(--text);
       }
 
       body.result-view .panel header {
