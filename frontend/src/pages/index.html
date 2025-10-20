@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jido · 시작하기</title>
+
+  <!-- 프로젝트 공통 테마 -->
+  <link rel="stylesheet" href="../styles/jido-theme.css" />
+
+  <style>
+    /* --- index 전용 보조 스타일 (최소) --- */
+    .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+    .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 980px){ .hero { grid-template-columns: 1fr; } }
+    .panel .inner { padding: 16px; }
+    .title { font-size: 18px; font-weight: 700; }
+    .subtitle { color: var(--sub); margin-top: 4px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 680px){ .grid-2 { grid-template-columns: 1fr; } }
+    .chips { display:flex; gap:8px; flex-wrap:wrap }
+    .chip { padding:6px 10px; border:1px solid var(--muted); border-radius:999px; font-size:12px; color:#9fb0c8 }
+    .footer-note{ color:#9fb0c8; font-size:12px; margin-top:8px }
+    .empty { margin: 0 }
+    .align-right { display:flex; justify-content:flex-end; gap:8px; padding:8px 0; }
+
+    /* --- 연결 마법사 --- */
+    .modal-overlay{ position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.55); z-index:1000 }
+    .modal{ width:min(860px, 92vw); background:var(--panel); border:1px solid var(--muted); border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,.55); overflow:hidden }
+    .modal header{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--muted) }
+    .steps{ display:flex; gap:8px; padding:10px 16px; border-bottom:1px solid var(--muted) }
+    .step{ flex:1; display:flex; align-items:center; gap:10px; color:#9fb0c8; font-size:13px }
+    .step .i{ width:22px;height:22px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--muted);background:#111623 }
+    .step.active{ color: var(--text) }
+    .step.active .i{ border-color: var(--accent); box-shadow:0 0 0 3px rgba(139,233,253,.18) }
+    .modal .body{ padding:16px }
+    .row{ display:grid; gap:8px }
+    .modal footer{ display:flex; justify-content:space-between; gap:8px; padding:12px 16px; border-top:1px solid var(--muted); background:#0f141a }
+    .hidden{ display:none !important }
+
+    /* --- 피드백 --- */
+    .shake{ animation:shake .45s cubic-bezier(.36,.07,.19,.97) both }
+    @keyframes shake{
+      10%,90%{transform:translateX(-1px)}
+      20%,80%{transform:translateX(2px)}
+      30%,50%,70%{transform:translateX(-4px)}
+      40%,60%{transform:translateX(4px)}
+    }
+    .success-check{width:58px;height:58px;border-radius:50%;background:linear-gradient(180deg,#3EEBAA,#1ea972);display:grid;place-items:center;margin:0 auto 8px}
+    .success-check svg{stroke:#0B1220; stroke-width:4; fill:none; stroke-dasharray:48; stroke-dashoffset:48; animation:draw .7s ease forwards}
+    @keyframes draw{to{stroke-dashoffset:0}}
+  </style>
+</head>
+<body>
+  <!-- 공통 헤더 & GitLab 다이얼로그 주입 -->
+  <div id="header-placeholder"></div>
+  <div id="dialog-placeholder"></div>
+
+  <div class="container">
+    <div class="align-right">
+      <button class="ghost" onclick="location.href='overview.html'">대시보드</button>
+      <button id="openWizardBtn" class="primary">연결 시작하기</button>
+    </div>
+
+    <main class="hero" role="main">
+      <!-- 왼쪽: 온보딩 카드들 -->
+      <section class="panel">
+        <div class="inner">
+          <div class="title">안녕하세요! 시작해볼까요?</div>
+          <p class="subtitle">연결을 만들면 바로 프롬프트 테스트가 가능해요. 키는 저장 후 다시 볼 수 없어요(보안상).</p>
+
+          <div class="grid-2" style="margin-top:12px">
+            <div class="card">
+              <label>빠른 시작 (샘플)</label>
+              <div class="chips" style="margin-top:6px">
+                <button class="ghost" id="useSampleOpenAI">OpenAI 샘플 불러오기</button>
+                <button class="ghost" id="useSampleInternal">사내 LLM 샘플</button>
+              </div>
+              <p class="footer-note">샘플은 폼을 자동으로 채워줘요. 실제 호출은 하지 않아요.</p>
+            </div>
+            <div class="card">
+              <label>이미 연결했나요?</label>
+              <p class="subtitle">대시보드에서 바로 테스트를 실행할 수 있어요.</p>
+              <button class="ghost" onclick="location.href='overview.html'">대시보드 열기</button>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>무엇을 할 수 있나요?</label>
+            <ul class="subtitle" style="margin:0 0 4px 18px;">
+              <li>싱글/AB 테스트로 프롬프트 품질 비교</li>
+              <li>결과·로그 확인 및 CSV 내보내기</li>
+              <li>GitLab 커밋으로 버전 고정</li>
+            </ul>
+          </div>
+
+          <div style="margin-top:8px">
+            <button id="openWizardBtn2">연결 만들기 마법사 열기</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 오른쪽: 상태 프리뷰 -->
+      <aside class="panel" aria-labelledby="statusTitle">
+        <div class="inner">
+          <div class="title" id="statusTitle">현재 상태</div>
+          <div class="chips" style="margin:10px 0 6px">
+            <span class="chip">MODE: <strong id="modeChip">OFFLINE</strong></span>
+            <span class="chip">연결: <strong id="connChip">없음</strong></span>
+            <span class="chip">비용 캡: <strong>on</strong></span>
+          </div>
+          <div style="margin-top:8px">
+            <label>최근 변경 사항</label>
+            <div class="card empty" id="changelog">아직 변경된 내용이 없어요.</div>
+          </div>
+          <div style="margin-top:8px">
+            <label>다음 단계</label>
+            <ol class="subtitle" style="margin:0 0 0 18px">
+              <li>연결 만들기 마법사 실행</li>
+              <li>대시보드에서 프롬프트 작성</li>
+              <li>테스트 실행 → 결과/로그 확인</li>
+            </ol>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- 연결 마법사 (3단계) -->
+  <div class="modal-overlay" id="wizard">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="wizardTitle">
+      <header>
+        <h2 id="wizardTitle" style="margin:0; font-size:16px">연결 마법사</h2>
+        <span class="chip">보안: 키는 저장 후 재표시되지 않음</span>
+      </header>
+
+      <div class="steps">
+        <div class="step active" data-step="1"><span class="i">1</span> Provider</div>
+        <div class="step" data-step="2"><span class="i">2</span> Key</div>
+        <div class="step" data-step="3"><span class="i">3</span> API & Test</div>
+      </div>
+
+      <div class="body">
+        <!-- Step 1 -->
+        <div class="row" id="step1">
+          <label for="provider">프로바이더 선택</label>
+          <select id="provider">
+            <option value="" selected disabled>선택하세요</option>
+            <option value="openai">OpenAI</option>
+            <option value="azure-openai">Azure OpenAI</option>
+            <option value="vertex">Google Vertex</option>
+            <option value="internal">사내 LLM</option>
+          </select>
+          <p class="footer-note">
+            OFFLINE 모드에서는 외부망 호출이 차단됩니다. 허용 도메인 내에서만 테스트가 진행됩니다(사내 LLM 권장).
+          </p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="row hidden" id="step2">
+          <label for="apiKey">API 키</label>
+          <div style="display:flex; gap:8px">
+            <input id="apiKey" type="password" placeholder="키를 입력하세요" autocomplete="off" />
+            <button id="toggleKey" class="ghost">보기</button>
+          </div>
+          <p class="footer-note">키는 서버에 암호화 저장되며, 저장 이후에는 다시 표시되지 않아요.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="row hidden" id="step3">
+          <label for="apiJson">API JSON/HTTP 붙여넣기</label>
+          <textarea id="apiJson" placeholder='예) {"model":"gpt-4o-mini","messages":[{"role":"user","content":"hello"}]}'></textarea>
+          <div class="grid-2">
+            <div>
+              <label for="vars">자동 추출 변수</label>
+              <input id="vars" placeholder="예: {{prompt}}, {{query}} (자동 추출 결과)" />
+            </div>
+            <div>
+              <label for="jsonPath">응답 추출(JSONPath)</label>
+              <input id="jsonPath" placeholder="$.choices[0].message.content" value="$.choices[0].message.content" />
+            </div>
+          </div>
+          <small id="jsonHint" class="footer-note">형식을 입력하면 즉시 검사합니다.</small>
+          <div id="testResult" class="footer-note"></div>
+        </div>
+
+        <!-- Step 3 성공 -->
+        <div class="row hidden" id="step3success" style="text-align:center">
+          <div class="success-check">
+            <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <div style="font-weight:700">연결 테스트 성공</div>
+          <p class="subtitle">지연 <span id="latencyChip">—</span> ms · 예상 토큰 비용 <span id="costChip">—</span></p>
+          <p class="subtitle">trace: <code id="traceId">—</code> <button class="ghost" id="copyTrace">복사</button></p>
+        </div>
+      </div>
+
+      <footer>
+        <span class="chip" id="stepInfo">1 / 3 • Provider</span>
+        <div style="display:flex; gap:8px">
+          <button class="ghost" id="cancelWizard">취소</button>
+          <button id="prevBtn" disabled>이전</button>
+          <button id="nextBtn">다음</button>
+          <button id="testBtn" style="display:none">연결 테스트</button>
+          <a class="ghost hidden" id="goDashboard" href="overview.html">대시보드로 이동</a>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // 공통 헤더 & GitLab 다이얼로그 주입 (동일 톤)
+    fetch("header.html").then(r=>r.text()).then(h=>{document.getElementById("header-placeholder").innerHTML=h});
+    fetch("gitlab-commit-dialog.html").then(r=>r.text()).then(h=>{document.getElementById("dialog-placeholder").innerHTML=h});
+
+    // 도우미
+    const $ = (q)=>document.querySelector(q);
+    const show = (el)=>el.classList.remove('hidden');
+    const hide = (el)=>el.classList.add('hidden');
+
+    // 마법사 열기/닫기
+    const openWizard = ()=>{ $("#wizard").style.display='grid'; setStep(1); };
+    document.getElementById("openWizardBtn").addEventListener("click", openWizard);
+    document.getElementById("openWizardBtn2").addEventListener("click", openWizard);
+    document.getElementById("cancelWizard").addEventListener("click", ()=> $("#wizard").style.display='none');
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && $("#wizard").style.display==='grid'){ $("#wizard").style.display='none'; } });
+
+    // 단계
+    const STEP_LABEL = ["Provider","Key","API & Test"];
+    let step = 1;
+    function setStep(n){
+      step=n;
+      ["#step1","#step2","#step3","#step3success"].forEach(id=> hide($(id)));
+      if(n===1) show($("#step1"));
+      if(n===2) show($("#step2"));
+      if(n===3) show($("#step3"));
+      $("#prevBtn").disabled=(n===1);
+      $("#nextBtn").style.display=(n<3)?'':'none';
+      $("#testBtn").style.display=(n===3)?'':'none';
+      $("#goDashboard").classList.add('hidden');
+      document.querySelectorAll('.step').forEach(s=> s.classList.toggle('active', Number(s.dataset.step)<=n));
+      $("#stepInfo").textContent = `${n} / 3 • ${STEP_LABEL[n-1]}`;
+      $("#testResult").textContent='';
+    }
+    document.getElementById("prevBtn").addEventListener("click", ()=> setStep(Math.max(1, step-1)));
+    document.getElementById("nextBtn").addEventListener("click", ()=>{
+      if(step===1 && !$("#provider").value){ $("#provider").classList.add('shake'); setTimeout(()=>$("#provider").classList.remove('shake'),450); return; }
+      if(step===2 && !$("#apiKey").value){ $("#apiKey").classList.add('shake'); setTimeout(()=>$("#apiKey").classList.remove('shake'),450); return; }
+      setStep(step+1);
+    });
+
+    // 키 보기/숨기기
+    document.getElementById("toggleKey").addEventListener("click", ()=>{
+      const i=$("#apiKey"); i.type = (i.type==='password'?'text':'password');
+      document.getElementById("toggleKey").textContent = (i.type==='password'?'보기':'숨기기');
+    });
+
+    // 샘플 자동 채우기
+    document.getElementById("useSampleOpenAI").addEventListener("click", ()=>{
+      $("#provider").value='openai';
+      $("#apiJson").value = JSON.stringify({ model:"gpt-4o-mini", messages:[{role:"user", content:"{{prompt}}"}] }, null, 2);
+      openWizard(); setStep(2);
+    });
+    document.getElementById("useSampleInternal").addEventListener("click", ()=>{
+      $("#provider").value='internal';
+      $("#apiJson").value = JSON.stringify({ model:"internal-llm-rag@v2", input:"{{query}}", options:{ temperature:0.2 } }, null, 2);
+      openWizard(); setStep(2);
+    });
+
+    // 변수 추출
+    function extractVars(){
+      try{
+        const t = $("#apiJson").value || '';
+        const m = Array.from(t.matchAll(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g)).map(x=>`{{${x[1]}}}`);
+        $("#vars").value = [...new Set(m)].join(', ');
+      }catch(e){}
+    }
+
+    // JSON 즉시 검사 힌트
+    function instantJSONHint(){
+      const el = document.getElementById('jsonHint');
+      try { 
+        JSON.parse(document.getElementById('apiJson').value); 
+        el.textContent='✓ 올바른 JSON 형식'; 
+      }
+      catch { 
+        el.textContent='✗ JSON 형식이 올바르지 않습니다'; 
+      }
+    }
+
+    document.getElementById("apiJson").addEventListener('input', ()=>{
+      extractVars();
+      instantJSONHint();
+    });
+
+    // API 호출 함수
+    async function postJSON(url, payload) {
+      const res = await fetch(url, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json().catch(()=>({}));
+      return { ok: res.ok, data };
+    }
+
+    // 백오프/레이트리밋 처리
+    async function testConnection() {
+      const payload = {
+        provider: document.getElementById('provider').value,
+        key_plain: document.getElementById('apiKey').value || undefined,
+        api_json: document.getElementById('apiJson').value,
+        json_path: document.getElementById('jsonPath').value
+      };
+      let attempt = 0; const backoff = [100, 300, 900]; // ms
+      while (true) {
+        const { ok, data } = await postJSON('/api/connections/test', payload);
+        if (ok) return { ok, data };
+        const ratelimit = data?.error_code === 'RATE_429' || data?.error_code === 'LLM_5XX';
+        if (!ratelimit || attempt >= backoff.length) return { ok, data };
+        await new Promise(r => setTimeout(r, backoff[attempt++]));
+      }
+    }
+
+    // 테스트 버튼 핸들러
+    document.getElementById("testBtn").addEventListener("click", async ()=>{
+      const btn = document.getElementById("testBtn");
+      btn.disabled = true; btn.textContent = "테스트 중...";
+      
+      if(!$("#apiJson").value.trim()){ 
+        $("#testResult").textContent='JSON을 붙여넣어 주세요.'; 
+        $("#apiJson").classList.add('shake'); 
+        setTimeout(()=>$("#apiJson").classList.remove('shake'),450); 
+        btn.disabled = false; btn.textContent = "연결 테스트";
+        return; 
+      }
+      try{ JSON.parse($("#apiJson").value) }catch(e){ 
+        $("#testResult").textContent='JSON 형식이 올바르지 않습니다.'; 
+        $("#apiJson").classList.add('shake'); 
+        setTimeout(()=>$("#apiJson").classList.remove('shake'),450); 
+        btn.disabled = false; btn.textContent = "연결 테스트";
+        return; 
+      }
+
+      const { ok, data } = await testConnection();
+      if (ok) {
+        hide($("#step3")); show($("#step3success"));
+        $("#latencyChip").textContent = data.latency_ms;
+        $("#costChip").textContent = `$${Number(data.est_cost_usd).toFixed(4)}`;
+        $("#traceId").textContent = data.trace_id;
+        $("#connChip").textContent = $("#provider").value;
+        $("#changelog").textContent = '연결 생성 및 테스트 성공 (' + new Date().toLocaleString() + ')';
+        $("#goDashboard").classList.remove('hidden');
+      } else {
+        $("#testResult").innerHTML = `❌ <b>${data.error_code || 'ERROR'}</b> — ${data.message || '실패'} (trace: ${data.trace_id || '-'})<br><small>${data.hint || ''}</small>`;
+        $("#testResult").classList.add('shake'); setTimeout(()=>$("#testResult").classList.remove('shake'),450);
+      }
+      btn.disabled = false; btn.textContent = "연결 테스트";
+    });
+
+    // trace_id 복사 기능
+    document.getElementById('copyTrace')?.addEventListener('click', ()=>{
+      const t = document.getElementById('traceId').textContent;
+      navigator.clipboard.writeText(t);
+    });
+
+    // 포커스 트랩
+    const modalOverlay = document.getElementById('wizard');
+    function trapFocus(e){
+      if (modalOverlay.style.display !== 'grid') return;
+      const f = modalOverlay.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+      if (!f.length) return;
+      const first=f[0], last=f[f.length-1];
+      if(e.key==='Tab'){
+        if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+        else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+      }
+    }
+    document.addEventListener('keydown', trapFocus);
+
+    // 단축키: Ctrl/Cmd+Enter = 테스트
+    document.addEventListener('keydown', (e)=>{
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && document.getElementById('step3') && !document.getElementById('step3').classList.contains('hidden')) {
+        document.getElementById('testBtn').click();
+      }
+    });
+
+    // MODE 칩 (쿼리 파라미터 지원)
+    const params = new URLSearchParams(location.search);
+    $("#modeChip").textContent = (params.get('mode') || 'OFFLINE').toUpperCase();
+  </script>
+</body>
+</html>
