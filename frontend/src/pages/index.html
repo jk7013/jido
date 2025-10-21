@@ -159,9 +159,9 @@
         <!-- Step 2 -->
         <div class="row hidden" id="step2">
           <label for="apiKey">API 키</label>
-          <div style="display:flex; gap:8px">
-            <input id="apiKey" type="password" placeholder="키를 입력하세요" autocomplete="off" />
-            <button id="toggleKey" class="ghost">보기</button>
+          <div style="display:flex; gap:12px; align-items:center">
+            <input id="apiKey" type="password" placeholder="키를 입력하세요" autocomplete="off" style="flex:1" />
+            <button id="toggleKey" class="ghost" style="flex-shrink:0; padding:10px 16px">보기</button>
           </div>
           <p class="footer-note">키는 서버에 암호화 저장되며, 저장 이후에는 다시 표시되지 않아요.</p>
         </div>
@@ -251,8 +251,22 @@
 
     // 키 보기/숨기기
     document.getElementById("toggleKey").addEventListener("click", ()=>{
-      const i=$("#apiKey"); i.type = (i.type==='password'?'text':'password');
-      document.getElementById("toggleKey").textContent = (i.type==='password'?'보기':'숨기기');
+      const i=$("#apiKey"); 
+      const isPassword = i.type === 'password';
+      i.type = isPassword ? 'text' : 'password';
+      document.getElementById("toggleKey").textContent = isPassword ? '숨기기' : '보기';
+      
+      // 시각적 피드백 추가
+      i.style.transition = 'all 0.2s ease';
+      if (isPassword) {
+        // 보기 상태: 강조 효과
+        i.style.borderColor = 'var(--accent)';
+        i.style.boxShadow = '0 0 0 2px rgba(139,233,253,0.2)';
+      } else {
+        // 숨기기 상태: 원래대로 복원
+        i.style.borderColor = '';
+        i.style.boxShadow = '';
+      }
     });
 
     // 샘플 자동 채우기
