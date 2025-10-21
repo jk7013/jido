@@ -225,6 +225,16 @@
     document.getElementById("cancelWizard").addEventListener("click", ()=> $("#wizard").style.display='none');
     document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && $("#wizard").style.display==='grid'){ $("#wizard").style.display='none'; } });
 
+    // API 키 스타일 적용 함수
+    function applyApiKeyStyles(inputElement) {
+      inputElement.style.transition = 'all 0.3s ease';
+      inputElement.style.flex = '1 1 0%';
+      inputElement.style.borderColor = 'var(--accent)';
+      inputElement.style.borderWidth = '2px';
+      inputElement.style.boxShadow = 'rgba(139, 233, 253, 0.4) 0px 0px 0px 4px, rgba(139, 233, 253, 0.2) 0px 0px 20px';
+      inputElement.style.backgroundColor = 'rgba(139, 233, 253, 0.05)';
+    }
+
     // 단계
     const STEP_LABEL = ["Provider","Key","API & Test"];
     let step = 1;
@@ -232,7 +242,11 @@
       step=n;
       ["#step1","#step2","#step3","#step3success"].forEach(id=> hide($(id)));
       if(n===1) show($("#step1"));
-      if(n===2) show($("#step2"));
+      if(n===2) {
+        show($("#step2"));
+        // Step 2로 이동할 때 API 키 스타일 자동 적용
+        setTimeout(() => applyApiKeyStyles($("#apiKey")), 10);
+      }
       if(n===3) show($("#step3"));
       $("#prevBtn").disabled=(n===1);
       $("#nextBtn").style.display=(n<3)?'':'none';
@@ -256,13 +270,8 @@
       i.type = isPassword ? 'text' : 'password';
       document.getElementById("toggleKey").textContent = isPassword ? '숨기기' : '보기';
       
-      // 시각적 피드백 추가 - 두 상태 모두 동일한 스타일 적용
-      i.style.transition = 'all 0.3s ease';
-      i.style.flex = '1 1 0%';
-      i.style.borderColor = 'var(--accent)';
-      i.style.borderWidth = '2px';
-      i.style.boxShadow = 'rgba(139, 233, 253, 0.4) 0px 0px 0px 4px, rgba(139, 233, 253, 0.2) 0px 0px 20px';
-      i.style.backgroundColor = 'rgba(139, 233, 253, 0.05)';
+      // 스타일 적용 함수 사용
+      applyApiKeyStyles(i);
     });
 
     // 샘플 자동 채우기
