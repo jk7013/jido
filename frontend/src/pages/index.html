@@ -256,21 +256,13 @@
       i.type = isPassword ? 'text' : 'password';
       document.getElementById("toggleKey").textContent = isPassword ? '숨기기' : '보기';
       
-      // 시각적 피드백 추가
+      // 시각적 피드백 추가 - 두 상태 모두 동일한 스타일 적용
       i.style.transition = 'all 0.3s ease';
-      if (isPassword) {
-        // 보기 상태: 강조 효과 (더 뚜렷하게)
-        i.style.borderColor = 'var(--accent)';
-        i.style.borderWidth = '2px';
-        i.style.boxShadow = '0 0 0 4px rgba(139,233,253,0.4), 0 0 20px rgba(139,233,253,0.2)';
-        i.style.backgroundColor = 'rgba(139,233,253,0.05)';
-      } else {
-        // 숨기기 상태: 원래대로 복원
-        i.style.borderColor = '';
-        i.style.borderWidth = '';
-        i.style.boxShadow = '';
-        i.style.backgroundColor = '';
-      }
+      i.style.flex = '1 1 0%';
+      i.style.borderColor = 'var(--accent)';
+      i.style.borderWidth = '2px';
+      i.style.boxShadow = 'rgba(139, 233, 253, 0.4) 0px 0px 0px 4px, rgba(139, 233, 253, 0.2) 0px 0px 20px';
+      i.style.backgroundColor = 'rgba(139, 233, 253, 0.05)';
     });
 
     // 샘플 자동 채우기
