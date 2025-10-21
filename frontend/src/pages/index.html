@@ -208,6 +208,11 @@
     </div>
   </div>
 
+  <!-- 토스트 알림 -->
+  <div id="toast" class="hidden" style="position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:2000;">
+    <div id="toastInner" class="card" style="padding:10px 14px;min-width:260px;text-align:center"></div>
+  </div>
+
   <script>
     // 공통 헤더 & GitLab 다이얼로그 주입 (동일 톤)
     fetch("header.html").then(r=>r.text()).then(h=>{document.getElementById("header-placeholder").innerHTML=h});
@@ -218,12 +223,36 @@
     const show = (el)=>el.classList.remove('hidden');
     const hide = (el)=>el.classList.add('hidden');
 
-    // 마법사 열기/닫기
-    const openWizard = ()=>{ $("#wizard").style.display='grid'; setStep(1); };
-    document.getElementById("openWizardBtn").addEventListener("click", openWizard);
-    document.getElementById("openWizardBtn2").addEventListener("click", openWizard);
-    document.getElementById("cancelWizard").addEventListener("click", ()=> $("#wizard").style.display='none');
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && $("#wizard").style.display==='grid'){ $("#wizard").style.display='none'; } });
+    // 토스트 알림 함수
+    function showToast(msg, ms=1200){
+      const t=document.getElementById('toast');
+      const i=document.getElementById('toastInner');
+      i.textContent=msg; t.classList.remove('hidden');
+      clearTimeout(showToast._t); showToast._t=setTimeout(()=>t.classList.add('hidden'), ms);
+    }
+
+    // 마법사 열기/닫기 (포커스 복원 포함)
+    let lastFocusEl;
+    function openWizard(){
+      lastFocusEl = document.activeElement;
+      $("#wizard").style.display='grid'; 
+      setStep(1);
+    }
+    function closeWizard(){
+      const m = document.getElementById('wizard');
+      m.style.display='none';
+      // 포커스 복원
+      if (lastFocusEl && typeof lastFocusEl.focus === 'function') lastFocusEl.focus();
+    }
+    
+    // 버튼/단축키 바인딩
+    const openBtns = [document.getElementById('openWizardBtn'), document.getElementById('openWizardBtn2')];
+    openBtns.forEach(btn=> btn && btn.addEventListener('click', openWizard));
+    
+    document.getElementById('cancelWizard')?.addEventListener('click', closeWizard);
+    document.addEventListener('keydown', (e)=>{
+      if(e.key==='Escape' && document.getElementById('wizard').style.display==='grid') closeWizard();
+    });
 
     // API 키 스타일 적용 함수
     function applyApiKeyStyles(inputElement) {
@@ -326,8 +355,11 @@
       }
     }
 
+    // 변수 추출 디바운스
+    let _vTimer; 
     document.getElementById("apiJson").addEventListener('input', ()=>{
-      extractVars();
+      clearTimeout(_vTimer); 
+      _vTimer = setTimeout(extractVars, 150);
       instantJSONHint();
     });
 
@@ -354,9 +386,11 @@
       while (true) {
         const { ok, data } = await postJSON('/api/connections/test', payload);
         if (ok) return { ok, data };
-        const ratelimit = data?.error_code === 'RATE_429' || data?.error_code === 'LLM_5XX';
-        if (!ratelimit || attempt >= backoff.length) return { ok, data };
-        await new Promise(r => setTimeout(r, backoff[attempt++]));
+        const isRl = data?.error_code === 'RATE_429' || data?.error_code === 'LLM_5XX';
+        if (!isRl || attempt >= backoff.length) return { ok, data };
+        const wait = backoff[attempt++];
+        showToast(`재시도 대기중… ${wait}ms (사유: ${data.error_code})`, Math.max(1200, wait+300));
+        await new Promise(r => setTimeout(r, wait));
       }
     }
 
@@ -381,6 +415,12 @@
       }
 
       const { ok, data } = await testConnection();
+      
+      // 키 메모리 정리 (보안)
+      const keyInput = document.getElementById('apiKey');
+      keyInput.value = '';
+      try { delete payload.key_plain; } catch (_) {}
+      
       if (ok) {
         hide($("#step3")); show($("#step3success"));
         $("#latencyChip").textContent = data.latency_ms;
