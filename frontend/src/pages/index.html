@@ -259,7 +259,14 @@
         // Step 2로 이동할 때 API 키 스타일 자동 적용
         setTimeout(() => applyApiKeyStyles($("#apiKey")), 10);
       }
-      if(n===3) show($("#step3"));
+      if(n===3) {
+        show($("#step3"));
+        // Step 3로 이동할 때 jsonPath, vars 스타일 자동 적용
+        setTimeout(() => {
+          applyApiKeyStyles($("#jsonPath"));
+          applyApiKeyStyles($("#vars"));
+        }, 10);
+      }
       $("#prevBtn").disabled=(n===1);
       $("#nextBtn").style.display=(n<3)?'':'none';
       $("#testBtn").style.display=(n===3)?'':'none';
