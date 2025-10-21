@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Prompt A/B 테스트 대시보드</title>
-  <link rel="stylesheet" href="css/jido-theme.css" />
+  <title>Jido · Overview</title>
+  <link rel="stylesheet" href="../styles/jido-theme.css" />
 </head>
 
   <body>
@@ -36,7 +36,7 @@
                   onclick="openGitLabDialog()"
                 >
                   <img
-                    src="img/gitlab.svg"
+                    src="../../public/gitlab.svg"
                     alt="GitLab"
                     style="width:16px; vertical-align:middle; margin-right:4px;"
                   />
@@ -937,11 +937,11 @@
           btnResultView.addEventListener("click", () => {
             console.log("결과보기 버튼 클릭, 현재 모드:", state.isSingleMode ? "Single" : "A/B");
             if (state.isSingleMode) {
-              // Single Mode일 때 single_result_view.html로 이동
-              location.href = 'single_result_view.html';
+              // Single Mode일 때 results-single.html로 이동
+              location.href = 'results-single.html';
             } else {
-              // A/B Mode일 때 result_view.html로 이동
-              location.href = 'result_view.html';
+              // A/B Mode일 때 results-ab.html로 이동
+              location.href = 'results-ab.html';
             }
           });
         }
@@ -952,11 +952,11 @@
           btnLogView.addEventListener("click", () => {
             console.log("로그보기 버튼 클릭, 현재 모드:", state.isSingleMode ? "Single" : "A/B");
             if (state.isSingleMode) {
-              // Single Mode일 때 single_log_view.html로 이동 (싱글 로그뷰)
-              location.href = 'single_log_view.html';
+              // Single Mode일 때 logs-single.html로 이동 (싱글 로그뷰)
+              location.href = 'logs-single.html';
             } else {
-              // A/B Mode일 때 log_view_css.html로 이동 (A/B 로그뷰)
-              location.href = 'log_view_css.html';
+              // A/B Mode일 때 logs-ab.html로 이동 (A/B 로그뷰)
+              location.href = 'logs-ab.html';
             }
           });
         }

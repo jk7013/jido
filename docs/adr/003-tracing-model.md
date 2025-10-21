@@ -1,0 +1,1 @@
+# ADR 003: Tracing Model\n\n## 결정\n- executions(trace) + execution_steps(span) ?�이�??�정.\n- 모든 ?�청 trace_id ?�성, ?�답 X-Trace-Id ?�더 ?�함.\n\n## 결과\n- ?�터??�?구현, ??구간 추적 가??

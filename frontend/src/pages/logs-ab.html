@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>PromptOps 싱글 로그 뷰어</title>
+    <title>Jido · A/B Logs</title>
     <!-- ✅ 공통 테마 적용 -->
-    <link rel="stylesheet" href="css/jido-theme.css" />
+    <link rel="stylesheet" href="../styles/jido-theme.css" />
 
     <style>
       /* 로그뷰 전용 추가 스타일 */
@@ -39,7 +39,7 @@
         height: 100%;
       }
 
-      body.single-log-view {
+      body.log-view {
         display: flex;
         flex-direction: column;
         min-height: 100vh;
@@ -88,8 +88,11 @@
         height: 10px;
         border-radius: 50%;
       }
-      .entry.single::before {
+      .entry.a::before {
         background: var(--accent);
+      }
+      .entry.b::before {
+        background: var(--good);
       }
       .entry .summary {
         font-weight: 500;
@@ -134,12 +137,12 @@
     </style>
   </head>
 
-  <body class="single-log-view">
+  <body class="log-view">
     <div id="header-placeholder"></div>
     <div id="return-container"></div>
 
     <script>
-      fetch("components/header.html")
+      fetch("../components/header.html")
         .then((res) => res.text())
         .then((html) => {
           document.getElementById("header-placeholder").innerHTML = html;
@@ -149,13 +152,13 @@
           // 대안: 직접 헤더 HTML 삽입
           document.getElementById("header-placeholder").innerHTML = `
             <header>
-              <h1>PromptOps</h1>
+              <h1>A/B Logs</h1>
               <nav class="top-menu">
-                <button class="ghost" onclick="location.href='dashboard.html'">대시보드</button>
-                <button class="ghost" onclick="location.href='result_view.html'">결과 보기</button>
-                <button class="ghost" onclick="location.href='log_view_css.html'">로그 보기</button>
+                <button class="ghost" onclick="location.href='overview.html'">대시보드</button>
+                <button class="ghost" onclick="location.href='results-ab.html'">결과 보기</button>
+                <button class="ghost" onclick="location.href='logs-ab.html'">로그 보기</button>
                 <button class="ghost" onclick="window.open('https://gitlab.company.local/promptops', '_blank')">
-                  <img src="img/gitlab.svg" alt="GitLab" style="width:16px; vertical-align:middle; margin-right:4px;" />
+                  <img src="../../public/gitlab.svg" alt="GitLab" style="width:16px; vertical-align:middle; margin-right:4px;" />
                   GitLab
                 </button>
               </nav>
@@ -182,8 +185,12 @@
     <!-- 메인 영역 -->
     <main id="llm" class="tab-content active">
       <section class="panel">
-        <h2>Single Prompt</h2>
-        <div id="timeline" class="timeline"></div>
+        <h2>Prompt A</h2>
+        <div id="timelineA" class="timeline"></div>
+      </section>
+      <section class="panel">
+        <h2>Prompt B</h2>
+        <div id="timelineB" class="timeline"></div>
       </section>
     </main>
 
@@ -207,14 +214,14 @@
 
     <script>
       const logs = {
-        single: [
+        A: [
           {
             timestamp: "2025-10-17 14:58:40,934",
             type: "request",
             data: {
               model: "Konan-LLM-ENT-11",
               user: "admin",
-              body: "안녕, 너는 어느회사 11m이니?",
+              body: "안녕. 너는 어느회사 llm이니?",
             },
           },
           {
@@ -223,6 +230,25 @@
             data: {
               output: "저는 코난테크놀로지의 Konect입니다.",
               latency_ms: 2870,
+            },
+          },
+        ],
+        B: [
+          {
+            timestamp: "2025-10-17 14:58:40,945",
+            type: "request",
+            data: {
+              model: "Konan-LLM-ENT-12",
+              user: "admin",
+              body: "안녕. 너는 어느회사 llm이니?",
+            },
+          },
+          {
+            timestamp: "2025-10-17 14:59:15,200",
+            type: "response",
+            data: {
+              output: "저는 Konan LLM-ENT-12 모델입니다.",
+              latency_ms: 3140,
             },
           },
         ],
@@ -272,7 +298,8 @@
         });
       }
 
-      renderTimeline("timeline", logs.single, "single");
+      renderTimeline("timelineA", logs.A, "a");
+      renderTimeline("timelineB", logs.B, "b");
 
       function renderGenericLogs(targetId, list) {
         const cont = document.getElementById(targetId);

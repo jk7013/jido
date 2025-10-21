@@ -1,0 +1,8 @@
+{
+  "AUTH_401": "Check API key/permissions.",
+  "FORBIDDEN_403": "Access denied.",
+  "RATE_429": "Too many requests. Slow down or try later.",
+  "LLM_TIMEOUT": "Upstream model timeout.",
+  "LLM_5XX": "Model provider error.",
+  "EXPORT_MASK_VIOLATION": "Sensitive fields cannot be exported."
+}

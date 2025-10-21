@@ -1,0 +1,7 @@
+services:
+  api:
+    build: ../backend
+    network_mode: none
+    environment:
+      - MODE=OFFLINE
+    command: ["pytest","-q","tests/offline_smoke"]

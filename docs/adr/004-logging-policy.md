@@ -1,0 +1,1 @@
+# ADR 004: Logging Policy\n\n## 결정\n- stdout JSON 로그 고정 ?�드: ts, level, trace_id, endpoint, model, tokens_in, tokens_out, latency_ms, status.\n- PII 마스?? ?�문 비�????�요???�플�?.\n\n## 결과\n- 공통 로거/마스???�터 구현.

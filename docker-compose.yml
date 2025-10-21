@@ -1,0 +1,67 @@
+version: "3.8"
+
+services:
+  # FastAPI 백엔드
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./data/jido.db
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+    volumes:
+      - ./data:/app/data
+      - ./backend:/app
+    depends_on:
+      - mlflow
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # React 프론트엔드
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    command: npm run dev
+
+  # MLflow 추적 서버
+  mlflow:
+    image: python:3.11-slim
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data/mlflow:/mlflow
+    command: >
+      bash -c "
+        pip install mlflow &&
+        mlflow server 
+        --backend-store-uri sqlite:///mlflow/mlflow.db 
+        --default-artifact-root /mlflow/artifacts 
+        --host 0.0.0.0 
+        --port 5000
+      "
+
+  # PostgreSQL (향후 전환용)
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=jido
+      - POSTGRES_USER=jido
+      - POSTGRES_PASSWORD=jido123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    profiles:
+      - postgres
+
+volumes:
+  postgres_data:
+
+
+

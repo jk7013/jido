@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  backend:
+    user: "1000:1000"
+    read_only: true
+    cap_drop:
+      - ALL
+    networks:
+      - internal
+    environment:
+      - OFFLINE_MODE=true
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+
+  postgres:
+    user: "999:999"
+    read_only: false
+    cap_drop:
+      - ALL
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+    internal: true

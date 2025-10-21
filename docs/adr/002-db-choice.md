@@ -1,0 +1,1 @@
+# ADR 002: Database Choice\n\n## 결정\n- 기본 DB??PostgreSQL. SQLite??로컬 개발 ?�용.\n\n## 근거\n- ?�시?? jsonb, ?�덱?? ?�장??\n\n## 결과\n- docker-compose??postgres 기본 ?�함.\n- 마이그레?�션/?�덱???�략 ?�립.
