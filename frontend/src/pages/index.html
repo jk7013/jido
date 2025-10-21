@@ -227,12 +227,22 @@
 
     // API 키 스타일 적용 함수
     function applyApiKeyStyles(inputElement) {
-      inputElement.style.transition = 'all 0.3s ease';
+      // jido-theme.css 기본 스타일 적용
+      inputElement.style.width = '100%';
+      inputElement.style.background = '#111623';
+      inputElement.style.color = 'var(--text)';
+      inputElement.style.border = '1px solid #2a3042';
+      inputElement.style.borderRadius = '8px';
+      inputElement.style.padding = '10px 12px';
+      inputElement.style.outline = 'none';
+      inputElement.style.transition = 'border-color 0.25s ease, box-shadow 0.25s ease';
+      inputElement.style.marginTop = '0';
+      
+      // 커스텀 강조 스타일
       inputElement.style.flex = '1 1 0%';
       inputElement.style.borderColor = 'var(--accent)';
       inputElement.style.borderWidth = '2px';
       inputElement.style.borderStyle = 'solid';
-      inputElement.style.borderRadius = '8px';
       inputElement.style.boxShadow = 'rgba(139, 233, 253, 0.4) 0px 0px 0px 4px, rgba(139, 233, 253, 0.2) 0px 0px 20px';
       inputElement.style.backgroundColor = 'rgba(139, 233, 253, 0.05)';
     }
