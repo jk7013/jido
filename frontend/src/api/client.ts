@@ -43,7 +43,7 @@ class ApiClient {
     } catch (error) {
       return {
         ok: false,
-        data: null,
+        data: {} as T,
         error: {
           error_code: 'NETWORK_ERROR',
           message: '네트워크 오류가 발생했습니다.',
@@ -96,7 +96,7 @@ class ApiClient {
 
     return {
       ok: false,
-      data: null,
+      data: {} as T,
       error: {
         error_code: 'MAX_RETRIES_EXCEEDED',
         message: '최대 재시도 횟수를 초과했습니다.',

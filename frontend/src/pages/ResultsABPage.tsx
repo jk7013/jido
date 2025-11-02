@@ -1,143 +1,138 @@
-import React, { useEffect, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
-import MetaChips from '../components/MetaChips';
-import TraceId from '../components/TraceId';
-import RawProcessedTabs from '../components/RawProcessedTabs';
-import { runsApi } from '../api/runs';
+import ABPanel from '../components/ABPanel';
+import { useSyncedScroll } from '../hooks/useSyncedScroll';
+import '../styles/results.css';
 
 const ResultsABPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const runId = searchParams.get('run') || '';
-  const arm = searchParams.get('arm') || 'a';
-  const metric = searchParams.get('metric') || 'faithfulness';
+  const [expanded, setExpanded] = useState(false);
 
-  const { data: result, isLoading, error } = useQuery({
-    queryKey: ['results', runId],
-    queryFn: () => runsApi.getResults(runId),
-    enabled: !!runId,
-  });
+  // 동기 스크롤을 위한 ref
+  const panelARef = useRef<HTMLDivElement>(null);
+  const panelBRef = useRef<HTMLDivElement>(null);
+  useSyncedScroll(panelARef, panelBRef);
 
-  const [currentArm, setCurrentArm] = useState<'a' | 'b'>(arm as 'a' | 'b');
+  // 데모용 데이터
+  const demoData = {
+    query: 'dfafdsf',
+    armA: {
+      latency: 719,
+      tokens: 173,
+      faithfulness: 0.99,
+      relevancy: 0.71,
+      ctxPrecision: 0.87,
+      ctxRecall: 0.97,
+      answer: '[internal-llm] "dfafdsf"에 대한 응답 예시. 템플릿 일부: ...',
+      model: 'internal-llm-rag@v2',
+      cost_usd: 0.0045,
+      param_hash: 'abc123',
+      prompt_version: 'v1.2.3'
+    },
+    armB: {
+      latency: 773,
+      tokens: 389,
+      faithfulness: 0.99,
+      relevancy: 0.77,
+      ctxPrecision: 0.74,
+      ctxRecall: 0.67,
+      answer: '[internal-llm] "dfafdsf"에 대한 응답 예시. 템플릿 일부: ...',
+      model: 'internal-llm-rag@v2',
+      cost_usd: 0.0089,
+      param_hash: 'def456',
+      prompt_version: 'v1.2.4'
+    }
+  };
 
-  useEffect(() => {
-    setCurrentArm(arm as 'a' | 'b');
-  }, [arm]);
+  const rawDataA = {
+    response: demoData.armA.answer,
+    metadata: {
+      model: demoData.armA.model,
+      latency: demoData.armA.latency,
+      tokens: demoData.armA.tokens
+    }
+  };
 
-  if (isLoading) {
-    return (
-      <div>
-        <Header />
-        <div className="container">
-          <div className="card">로딩 중...</div>
-        </div>
-      </div>
-    );
-  }
+  const rawDataB = {
+    response: demoData.armB.answer,
+    metadata: {
+      model: demoData.armB.model,
+      latency: demoData.armB.latency,
+      tokens: demoData.armB.tokens
+    }
+  };
 
-  if (error || !result) {
-    return (
-      <div>
-        <Header />
-        <div className="container">
-          <div className="card" style={{ color: 'var(--bad)' }}>
-            <h2>오류</h2>
-            <p>결과를 불러올 수 없습니다.</p>
-            {result?.run?.trace_id && <TraceId id={result.run.trace_id} />}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleCopyTrace = () => {
+    navigator.clipboard.writeText(runId);
+    console.log('Trace copied:', runId);
+  };
 
   const handleExportCSV = () => {
-    // CSV 내보내기 로직
-    console.log('CSV 내보내기');
+    console.log('Export CSV');
+  };
+
+  const handleGitLab = () => {
+    console.log('GitLab action');
   };
 
   return (
-    <div>
+    <div className="result-view">
       <Header />
-      <div className="container">
-        <div className="align-right">
-          <button className="ghost" onClick={handleExportCSV}>Export to CSV</button>
-          <Link to="/logs/ab" className="ghost">View Logs</Link>
-          <Link to="/dashboard" className="ghost">← 대시보드</Link>
-        </div>
-
-        <main>
-          <div className="panel">
-            <div className="inner">
-              <div className="title">A/B Test Results</div>
-              
-              {result.run && <MetaChips meta={result.run} />}
-              {result.run?.trace_id && <TraceId id={result.run.trace_id} />}
-              
-              {/* A/B 패널 */}
-              <div className="ab-panel" style={{ 
-                display: 'grid', 
-                gridTemplateColumns: '1fr 1fr', 
-                gap: '16px',
-                marginTop: '16px'
-              }}>
-                <div className="panel">
-                  <div className="inner">
-                    <div className="title">Prompt A</div>
-                    <RawProcessedTabs 
-                      raw={result.result?.a} 
-                      path={result.json_path || ''} 
-                    />
-                  </div>
-                </div>
-                
-                <div className="panel">
-                  <div className="inner">
-                    <div className="title">Prompt B</div>
-                    <RawProcessedTabs 
-                      raw={result.result?.b} 
-                      path={result.json_path || ''} 
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* 지표 테이블 */}
-              <div style={{ marginTop: '16px' }}>
-                <div className="title">지표 비교</div>
-                <table className="metric-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">지표</th>
-                      <th scope="col">A</th>
-                      <th scope="col">B</th>
-                      <th scope="col">우세</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Faithfulness</td>
-                      <td>{result.result?.metrics?.a?.faithfulness || '—'}</td>
-                      <td>{result.result?.metrics?.b?.faithfulness || '—'}</td>
-                      <td>
-                        {result.result?.metrics?.a?.faithfulness > result.result?.metrics?.b?.faithfulness ? 'A' : 'B'}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Answer Relevancy</td>
-                      <td>{result.result?.metrics?.a?.relevancy || '—'}</td>
-                      <td>{result.result?.metrics?.b?.relevancy || '—'}</td>
-                      <td>
-                        {result.result?.metrics?.a?.relevancy > result.result?.metrics?.b?.relevancy ? 'A' : 'B'}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+      <main className="mainFull">
+        <div className="abContainer">
+          <div className="abPanel" ref={panelARef}>
+            <ABPanel
+              side="A"
+              data={{
+                query: demoData.query,
+                answer: demoData.armA.answer,
+                latency: demoData.armA.latency,
+                tokens: demoData.armA.tokens,
+                faithfulness: demoData.armA.faithfulness,
+                relevancy: demoData.armA.relevancy,
+                ctxPrecision: demoData.armA.ctxPrecision,
+                ctxRecall: demoData.armA.ctxRecall,
+                model: demoData.armA.model,
+                cost_usd: demoData.armA.cost_usd,
+                param_hash: demoData.armA.param_hash,
+                prompt_version: demoData.armA.prompt_version
+              }}
+              rawData={rawDataA}
+              jsonPath="$.response"
+              onCopyTrace={handleCopyTrace}
+              onExportCSV={handleExportCSV}
+              onGitLab={handleGitLab}
+            />
           </div>
-        </main>
-      </div>
+
+          <div className="abPanel" ref={panelBRef}>
+            <ABPanel
+              side="B"
+              data={{
+                query: demoData.query,
+                answer: demoData.armB.answer,
+                latency: demoData.armB.latency,
+                tokens: demoData.armB.tokens,
+                faithfulness: demoData.armB.faithfulness,
+                relevancy: demoData.armB.relevancy,
+                ctxPrecision: demoData.armB.ctxPrecision,
+                ctxRecall: demoData.armB.ctxRecall,
+                model: demoData.armB.model,
+                cost_usd: demoData.armB.cost_usd,
+                param_hash: demoData.armB.param_hash,
+                prompt_version: demoData.armB.prompt_version
+              }}
+              rawData={rawDataB}
+              jsonPath="$.response"
+              onCopyTrace={handleCopyTrace}
+              onExportCSV={handleExportCSV}
+              onGitLab={handleGitLab}
+            />
+          </div>
+        </div>
+      </main>
     </div>
   );
 };

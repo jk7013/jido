@@ -1,5 +1,4 @@
 import React from 'react';
-import { Virtuoso } from 'react-virtuoso';
 
 interface JsonViewerProps {
   data: any;
@@ -46,7 +45,7 @@ const JsonViewer: React.FC<JsonViewerProps> = ({ data, error }) => {
   const jsonString = formatJson(data);
   const lines = jsonString.split('\n');
 
-  // 대용량 JSON의 경우 가상 스크롤 사용
+  // 대용량 JSON의 경우 일반 스크롤 사용
   if (lines.length > 200) {
     return (
       <div style={{ 
@@ -54,25 +53,22 @@ const JsonViewer: React.FC<JsonViewerProps> = ({ data, error }) => {
         background: 'var(--panel)', 
         border: '1px solid var(--muted)',
         borderRadius: '8px',
-        overflow: 'hidden'
+        overflow: 'auto'
       }}>
-        <Virtuoso
-          data={lines}
-          itemContent={(index, line) => (
-            <div 
-              key={index}
-              style={{ 
-                padding: '2px 8px',
-                fontFamily: 'monospace',
-                fontSize: '12px',
-                lineHeight: '1.4',
-                whiteSpace: 'pre'
-              }}
-            >
-              {line}
-            </div>
-          )}
-        />
+        {lines.map((line, index) => (
+          <div 
+            key={index}
+            style={{ 
+              padding: '2px 8px',
+              fontFamily: 'monospace',
+              fontSize: '12px',
+              lineHeight: '1.4',
+              whiteSpace: 'pre'
+            }}
+          >
+            {line}
+          </div>
+        ))}
       </div>
     );
   }

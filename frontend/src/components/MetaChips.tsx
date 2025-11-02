@@ -13,7 +13,7 @@ interface MetaChipsProps {
 }
 
 const MetaChips: React.FC<MetaChipsProps> = ({ meta }) => {
-  const copyToClipboard = (text: string, label: string) => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     // 토스트 알림 (구현 필요)
   };
@@ -53,7 +53,7 @@ const MetaChips: React.FC<MetaChipsProps> = ({ meta }) => {
           <span 
             key={chip.label}
             className="chip" 
-            onClick={() => copyToClipboard(String(chip.value || ''), chip.label)}
+            onClick={() => copyToClipboard(String(chip.value || ''))}
             style={{ cursor: 'pointer' }}
             title={`${chip.label}: ${displayValue} (클릭하여 복사)`}
           >

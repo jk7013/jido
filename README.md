@@ -23,43 +23,66 @@ jido/
 
 ## 🚀 빠른 시작
 
-### 1. 환경 설정
+### ⚡ 원클릭 시작 (권장)
+
+```powershell
+# Windows PowerShell에서 실행
+.\scripts\start-jido.ps1
+
+# 다른 포트 사용
+.\scripts\start-jido.ps1 -Port 3002
+```
+
+### 🔧 문제 해결
+
+```powershell
+# 설정 검증
+.\scripts\check-setup.ps1
+
+# 문제 진단 및 해결
+.\scripts\troubleshoot.ps1
+```
+
+### 📋 수동 설정
+
+#### 1. 환경 설정
 
 ```bash
 # 환경 변수 설정
 cp env.example .env
 # .env 파일에서 API 키 등 설정
-
-# 백엔드 의존성 설치
-cd backend
-pip install -r requirements.txt
-
-# 프론트엔드 의존성 설치
-cd frontend
-npm install
 ```
 
-### 2. 개발 서버 실행
+#### 2. Docker로 실행 (권장)
+
+```bash
+# 모든 서비스 실행
+docker-compose up -d
+
+# PostgreSQL 포함 실행
+docker-compose --profile postgres up -d
+```
+
+#### 3. 개발 서버 실행 (로컬)
 
 ```bash
 # 백엔드 서버 (포트 8000)
 cd backend
+pip install -r requirements.txt
 uvicorn app.main:app --reload
 
-# 프론트엔드 서버 (포트 3000)
+# 프론트엔드 서버 (포트 3001)
 cd frontend
+npm install
 npm run dev
 ```
 
-### 3. Docker로 실행
+### 🌐 접속 정보
 
-```bash
-# 모든 서비스 실행
-docker-compose up
-
-# PostgreSQL 포함 실행
-docker-compose --profile postgres up
-```
+- **Frontend**: http://localhost:3001
+- **MLflow**: http://localhost:5000
+- **Backend API**: http://localhost:8000
+- **API Docs**: http://localhost:8000/docs
 
 ## 📚 API 문서
 
@@ -135,6 +158,3 @@ npm run lint
 ## 📞 지원
 
 문제가 있거나 질문이 있으시면 이슈를 생성해 주세요.
-
-
-

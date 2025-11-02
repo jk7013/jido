@@ -1,43 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import JsonViewer from './JsonViewer';
+import { extractAnswer } from '../utils/extractAnswer';
 
 interface RawProcessedTabsProps {
   raw: any;
-  path: string;
+  path?: string;
 }
+
+// 간단한 토스트 알림 함수 (임시)
+const showToast = (message: string) => {
+  console.log('Toast:', message);
+  // 실제 토스트 컴포넌트가 구현되면 교체
+};
 
 const RawProcessedTabs: React.FC<RawProcessedTabsProps> = ({ raw, path }) => {
   const [tab, setTab] = useState<'processed' | 'raw'>('processed');
-  const [processed, setProcessed] = useState<string | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (tab === 'processed') {
-      try {
-        // JSONPath 적용 로직 (간단한 구현)
-        if (path && raw) {
-          // 실제로는 jsonpath 라이브러리 사용
-          const result = JSON.stringify(raw, null, 2);
-          setProcessed(result);
-          setError(null);
-        } else {
-          setProcessed(JSON.stringify(raw, null, 2));
-          setError(null);
-        }
-      } catch (err) {
-        setError('파싱 실패');
-        setProcessed(undefined);
-      }
+  // Processed 텍스트 추출
+  const processed = useMemo(() => {
+    try {
+      return extractAnswer(raw, path);
+    } catch (err) {
+      setError('파싱 실패');
+      return undefined;
     }
-  }, [tab, raw, path]);
+  }, [raw, path]);
 
   useEffect(() => {
-    if (tab === 'processed' && processed === undefined && error) {
+    if (tab === 'processed' && processed === undefined) {
       setTab('raw');
-      // 토스트 알림 (구현 필요)
-      console.log('파싱 실패 — Raw로 전환');
+      showToast('파싱 실패 — Raw로 전환');
     }
-  }, [tab, processed, error]);
+  }, [tab, processed]);
 
   return (
     <div>

@@ -1,34 +1,44 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useRunsStore } from '../stores/useRunsStore';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  onExportCSV?: () => void;
+  runCount?: number;
+  isSingleMode?: boolean;
+}
+
+const Header: React.FC<HeaderProps> = ({ onExportCSV, runCount = 0, isSingleMode = false }) => {
   const location = useLocation();
-  const { runs } = useRunsStore();
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
+  // 모드에 따른 적절한 경로 결정
+  const getResultsPath = () => {
+    return isSingleMode ? '/results/single' : '/results/ab';
+  };
+
+  const getLogsPath = () => {
+    return isSingleMode ? '/logs/single' : '/logs/ab';
+  };
+
   return (
     <header>
       <h1>PromptOps</h1>
-      <nav className="top-menu">
+      <div className="right">
+        <button className="ghost" onClick={onExportCSV}>
+          CSV로 내보내기
+        </button>
         <Link 
-          to="/dashboard" 
-          className={`ghost ${isActive('/dashboard') ? 'active' : ''}`}
-        >
-          대시보드
-        </Link>
-        <Link 
-          to="/results/ab" 
-          className={`ghost ${isActive('/results/ab') || isActive('/results/single') ? 'active' : ''}`}
+          to={getResultsPath()} 
+          className="ghost"
         >
           결과 보기
         </Link>
         <Link 
-          to="/logs/ab" 
-          className={`ghost ${isActive('/logs/ab') || isActive('/logs/single') ? 'active' : ''}`}
+          to={getLogsPath()} 
+          className="ghost"
         >
           로그 보기
         </Link>
@@ -36,7 +46,8 @@ const Header: React.FC = () => {
           <img src="/gitlab.svg" alt="GitLab" style={{width:16, verticalAlign:'middle', marginRight:4}} />
           GitLab
         </button>
-      </nav>
+        <span className="muted">runs: {runCount}</span>
+      </div>
     </header>
   );
 };
